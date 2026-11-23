@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bakterien-Lernwerkstatt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf8f3; --ink:#3d3b52; --muted:#7a7890; --card:#ffffff; --line:#ebe6dc;
+  --mint:#cdeee0; --mint-d:#4fae8a; --lav:#e4ddff; --lav-d:#7d6bd6; --sky:#d6ebff; --sky-d:#4b8fd1;
+  --peach:#ffdcc9; --peach-d:#e2825a; --butter:#fff1bf; --butter-d:#d3a522; --rose:#ffd7e1; --rose-d:#d9668a;
+  --ok:#3fa97c; --ok-bg:#dcf4e8; --bad:#d9536f; --bad-bg:#fde1e7; --part:#e0a326; --part-bg:#fff2cf;
+  --shadow:0 6px 22px rgba(80,70,120,.09);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.5;
+  background-image:radial-gradient(circle at 8% 12%,#ffe9f0 0 120px,transparent 121px),radial-gradient(circle at 95% 30%,#e6f6ef 0 160px,transparent 161px),radial-gradient(circle at 15% 90%,#eae5ff 0 140px,transparent 141px);background-attachment:fixed}
+h1,h2,h3,.fred{font-family:Fredoka,Nunito,sans-serif;font-weight:600;letter-spacing:.2px}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 60px}
+header.top{position:sticky;top:0;z-index:20;background:rgba(251,248,243,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-family:Fredoka;font-weight:700;font-size:20px;cursor:pointer}
+.logo .blob{width:38px;height:38px;border-radius:50%;background:var(--mint);display:grid;place-items:center;font-size:22px}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 14px;font-weight:800;font-size:15px;background:var(--butter)}
+.pill.lav{background:var(--lav)}
+.btn{border:0;border-radius:14px;padding:11px 20px;font-weight:800;background:var(--ink);color:#fff;box-shadow:0 3px 0 rgba(0,0,0,.15);transition:transform .08s}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.soft{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.mint{background:var(--mint-d)}.btn.lav{background:var(--lav-d)}.btn.peach{background:var(--peach-d)}
+.btn.small{padding:7px 13px;font-size:14px;border-radius:11px}
+.btn:disabled{opacity:.45;cursor:default}
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;margin:26px 0 10px;align-items:center}
+.hero h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:0 0 10px}
+.hero p{margin:0;color:var(--muted)}
+.hero .art{background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:16px}
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:20px;margin:16px 0}
+.sec-title{display:flex;align-items:center;gap:10px;margin:28px 0 6px}
+.sec-title h2{margin:0;font-size:22px}
+.num{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:Fredoka;font-weight:700}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.cat{border:3px solid transparent;border-radius:20px;padding:14px;cursor:pointer;position:relative;transition:transform .1s;user-select:none}
+.cat:hover{transform:translateY(-2px)}
+.cat .ic{font-size:30px}
+.cat .nm{font-family:Fredoka;font-weight:600;font-size:17px;line-height:1.2;margin:4px 0 8px}
+.cat .bar{height:8px;background:rgba(255,255,255,.7);border-radius:9px;overflow:hidden}
+.cat .bar i{display:block;height:100%;background:var(--ink);opacity:.55;border-radius:9px}
+.cat .meta{font-size:13px;color:var(--ink);opacity:.75;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.cat .chk{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:900;font-size:15px;opacity:.35}
+.cat.on{border-color:var(--ink)}
+.cat.on .chk{opacity:1;background:var(--ink);color:#fff}
+.cat .sp{border:0;background:rgba(255,255,255,.75);border-radius:9px;padding:3px 9px;font-size:12px;font-weight:800;color:var(--ink)}
+.toggles{display:flex;flex-wrap:wrap;gap:10px}
+.tg{border:2px solid var(--line);background:#fff;border-radius:16px;padding:10px 14px;cursor:pointer;text-align:left;min-width:150px}
+.tg b{display:block;font-family:Fredoka;font-weight:600}
+.tg small{color:var(--muted)}
+.tg.on{border-color:var(--ink);background:var(--lav)}
+.go-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.stats{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.lvl-ic{font-size:46px;width:74px;height:74px;border-radius:22px;background:var(--butter);display:grid;place-items:center}
+.lvl-bar{height:14px;background:#f1ece2;border-radius:10px;overflow:hidden;margin-top:6px}
+.lvl-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--mint-d),var(--sky-d));border-radius:10px}
+/* quiz */
+.qtop{display:flex;align-items:center;gap:12px;margin:20px 0 6px;flex-wrap:wrap}
+.prog{flex:1;min-width:140px;height:12px;background:#ece7dd;border-radius:9px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--mint-d);transition:width .3s}
+.task{background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:22px;margin:14px 0;border-top:10px solid var(--mint)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{border-radius:999px;padding:3px 11px;font-size:13px;font-weight:800;background:#f3efe7}
+.q{font-size:18px;margin:0 0 14px}
+.q b{font-weight:800}
+.info{background:#f7f4ee;border-radius:16px;padding:14px 16px;margin:0 0 14px;font-size:16px}
+.opt{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin:8px 0;cursor:pointer;background:#fff}
+.opt:hover{border-color:#cfc8ba}
+.opt input{margin-top:5px;transform:scale(1.25);accent-color:var(--ink)}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;border:2px solid var(--line);border-radius:16px;padding:10px 14px;margin:8px 0;background:#fff;flex-wrap:wrap}
+.row .txt{flex:1;min-width:200px}
+.row.ok{border-color:var(--ok);background:var(--ok-bg)}
+.row.bad{border-color:var(--bad);background:var(--bad-bg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:2px solid var(--line);background:#fff;border-radius:11px;padding:6px 12px;font-weight:800;font-size:14px}
+.seg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.seg button:disabled{cursor:default}
+.why{flex-basis:100%;font-size:14.5px;color:#555;margin-top:2px}
+select,input[type=text],input[type=number],textarea{font:inherit;border:2px solid var(--line);border-radius:12px;padding:8px 10px;background:#fff;color:var(--ink);max-width:100%}
+select:focus,input:focus,textarea:focus{outline:3px solid var(--lav);border-color:var(--lav-d)}
+select.ok,input.ok{border-color:var(--ok);background:var(--ok-bg)}
+select.bad,input.bad{border-color:var(--bad);background:var(--bad-bg)}
+textarea{width:100%;min-height:150px;resize:vertical;line-height:1.5}
+.cloze{font-size:17px;line-height:2.4;background:#f7f4ee;border-radius:16px;padding:14px 18px}
+.cloze select,.cloze input{padding:3px 6px;margin:0 2px}
+.cloze input{width:150px}
+.sol{font-size:13px;font-weight:800;color:var(--ok);margin-left:2px}
+.ord li{list-style:none;display:flex;align-items:center;gap:10px;border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px 12px;margin:8px 0}
+.ord{padding:0;margin:0}
+.ord .n{width:28px;height:28px;flex:none;border-radius:50%;background:var(--sky);display:grid;place-items:center;font-weight:900}
+.ord .t{flex:1}
+.ord .mv{display:flex;flex-direction:column;gap:3px}
+.ord .mv button{border:0;background:#f1ece2;border-radius:8px;width:34px;height:24px;font-weight:900}
+.ord li.ok{border-color:var(--ok);background:var(--ok-bg)}
+.ord li.bad{border-color:var(--bad);background:var(--bad-bg)}
+.fig{width:100%;height:auto;display:block;background:#fff;border-radius:16px}
+.figbox .fig{max-height:400px}
+.figbox{background:#fff;border:2px solid var(--line);border-radius:18px;padding:8px;margin:0 0 14px}
+.lblgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px 16px}
+.lbl{display:flex;align-items:center;gap:8px}
+.lbl .n{width:30px;height:30px;flex:none;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-weight:900;background:#fff}
+.lbl select{flex:1;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.legend button{border:3px solid transparent;border-radius:12px;padding:6px 12px;font-weight:800;font-size:14px;color:var(--ink)}
+.legend button.on{border-color:var(--ink);transform:scale(1.05)}
+.legend .rub{background:#fff;border:2px dashed #bbb}
+.marktext{background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px 18px;line-height:2}
+.mk{cursor:pointer;border-bottom:2px dotted #b9b3a6;padding:2px 1px;border-radius:5px;transition:background .15s}
+.mk:hover{background:#f3efe7}
+.mk.ok{outline:2px solid var(--ok)}
+.mk.miss{outline:2px dashed var(--bad)}
+.mk.badx{text-decoration:line-through;text-decoration-color:var(--bad);text-decoration-thickness:2px;background:var(--bad-bg)!important}
+.fb{border-radius:18px;padding:14px 16px;margin-top:16px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-bg)}.fb.part{background:var(--part-bg)}.fb.bad{background:var(--bad-bg)}
+.fb h3{margin:0 0 4px;font-size:19px}
+.fb .ex{font-size:15.5px}
+.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.warn{color:var(--bad);font-weight:800;font-size:14px}
+.horizon{background:#f7f4ee;border-radius:16px;padding:14px 16px;margin-top:14px}
+.horizon label{display:flex;gap:10px;align-items:flex-start;margin:8px 0;cursor:pointer}
+.horizon input{margin-top:5px;transform:scale(1.3);accent-color:var(--ok)}
+.found{font-size:12px;font-weight:800;color:var(--ok);background:#fff;border-radius:8px;padding:1px 7px;margin-left:4px}
+.model{background:#fff;border-left:5px solid var(--lav-d);border-radius:10px;padding:10px 14px;margin-top:10px;font-size:15.5px}
+.sbf{display:grid;grid-template-columns:150px 1fr;gap:0;border:2px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:6px}
+.sbf .k{padding:10px 12px;font-weight:800;font-size:15px;border-bottom:2px solid #fff}
+.sbf .v{padding:6px;border-bottom:2px solid var(--line);background:#fff}
+.sbf textarea{min-height:60px;border:0;padding:6px}
+.tbl{border-collapse:collapse;width:100%;font-size:15px;background:#fff;border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+.tbl th{background:#f3efe7}
+.tbl td:first-child{text-align:left;font-weight:700}
+.sum-list{list-style:none;padding:0;margin:0}
+.sum-list li{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.sum-list .s{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:900;flex:none;color:#fff}
+.big{font-family:Fredoka;font-size:54px;font-weight:700;line-height:1}
+.modal{position:fixed;inset:0;background:rgba(40,35,60,.35);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:24px;max-width:640px;width:100%;max-height:86vh;overflow:auto;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.modal .box h2{margin-top:0}
+.modal ul{padding-left:20px}
+.modal li{margin:6px 0}
+.op{display:grid;grid-template-columns:130px 1fr;gap:6px 12px;font-size:15.5px}
+.op b{font-family:Fredoka;font-weight:600}
+.afb{display:inline-block;border-radius:7px;padding:0 6px;font-size:12px;font-weight:800;margin-left:4px}
+.confetti{position:fixed;pointer-events:none;font-size:26px;z-index:60;animation:fly 1.3s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) rotate(340deg);opacity:0}}
+.hide{display:none!important}
+footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px}
+@media (max-width:720px){
+  body{font-size:16px}
+  .hero{grid-template-columns:1fr}
+  .hero .art{display:none}
+  .sbf{grid-template-columns:1fr}
+  .sbf .k{border-bottom:0}
+  .task{padding:16px}
+  .op{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div class="logo" onclick="showHome()"><span class="blob">🦠</span><span>Bakterien-Lernwerkstatt</span></div>
+  <span class="spacer"></span>
+  <button class="btn soft small" onclick="openModal('opModal')">📖 Operatoren</button>
+  <span class="pill lav" id="lvlPill">🌱</span>
+  <span class="pill" id="ptsPill">⭐ 0</span>
+</div></header>
+
+<div class="wrap">
+
+<!-- ===================== START ===================== -->
+<section id="home">
+  <div class="hero">
+    <div>
+      <h1>Fit für die Kursarbeit Nr. 2 🧫</h1>
+      <p>Bakterien · Pioniere der Mikrobiologie · Antibiotika · Salmonellose · Steckbrief erstellen. Wähle Themen und Anforderungsbereiche, löse Aufgaben und sammle Punkte. Freitext-Aufgaben bewertest du ehrlich selbst mit dem Erwartungshorizont.</p>
+    </div>
+    <div class="art" id="heroArt"></div>
+  </div>
+
+  <div class="card stats">
+    <div class="lvl-ic" id="lvlIc">🌱</div>
+    <div>
+      <div class="fred" style="font-size:20px" id="lvlName">Keimling</div>
+      <div style="color:var(--muted);font-size:15px" id="lvlTxt">0 Punkte</div>
+      <div class="lvl-bar"><i id="lvlBar" style="width:0"></i></div>
+    </div>
+  </div>
+
+  <div class="sec-title"><span class="num">1</span><h2>Themen auswählen</h2></div>
+  <p style="margin:0 0 10px;color:var(--muted);font-size:15px">Tippe auf ein Thema, um es an- oder abzuwählen. Mit „Spickzettel“ kannst du das Wichtigste vorher wiederholen.</p>
+  <div class="cats" id="cats"></div>
+
+  <div class="sec-title"><span class="num">2</span><h2>Anforderungsbereiche</h2></div>
+  <div class="toggles" id="afbs"></div>
+
+  <div class="sec-title"><span class="num">3</span><h2>Wie viele Aufgaben?</h2></div>
+  <div class="toggles" id="counts"></div>
+
+  <div class="go-row">
+    <button class="btn mint" onclick="startSel()">▶ Los geht's</button>
+    <button class="btn lav" onclick="startExam()">📝 Probe-Kursarbeit (12 gemischte Aufgaben)</button>
+    <button class="btn peach" id="wrongBtn" onclick="startWrong()">🔁 Fehler wiederholen</button>
+  </div>
+  <p id="homeWarn" class="warn"></p>
+
+  <footer>
+    Dein Punktestand wird nur in diesem Browser gespeichert.
+    <button class="btn soft small" style="margin-left:8px" onclick="resetAll()">Fortschritt zurücksetzen</button>
+  </footer>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section id="quiz" class="hide">
+  <div class="qtop">
+    <button class="btn soft small" onclick="if(confirm('Übung beenden? Deine gesammelten Punkte bleiben erhalten.'))showSummary()">✕ Beenden</button>
+    <div class="prog"><i id="qProg"></i></div>
+    <span class="fred" id="qCount">1 / 10</span>
+    <span class="pill" id="qPts">+0</span>
+  </div>
+  <div id="taskBox"></div>
+</section>
+
+<!-- ===================== SUMMARY ===================== -->
+<section id="summary" class="hide"></section>
+</div>
+
+<!-- Spickzettel -->
+<div class="modal" id="spModal" onclick="if(event.target===this)closeModal('spModal')"><div class="box" id="spBox"></div></div>
+<!-- Operatoren -->
+<div class="modal" id="opModal" onclick="if(event.target===this)closeModal('opModal')"><div class="box">
+  <h2>📖 Operatoren – was wird von mir verlangt?</h2>
+  <div class="op">
+    <b>nennen</b><span>Begriffe oder Fakten ohne Erklärung aufzählen. <span class="afb" style="background:var(--mint)">AFB I</span></span>
+    <b>beschreiben</b><span>Sachverhalte oder Abbildungen in eigenen Worten genau und geordnet darstellen. <span class="afb" style="background:var(--mint)">AFB I–II</span></span>
+    <b>beschriften</b><span>Teile einer Abbildung mit den passenden Fachbegriffen versehen. <span class="afb" style="background:var(--mint)">AFB I</span></span>
+    <b>erklären</b><span>Einen Sachverhalt mit Ursachen und Gründen verständlich machen („weil …, deshalb …“). <span class="afb" style="background:var(--sky)">AFB II</span></span>
+    <b>erläutern</b><span>Wie erklären, aber ausführlicher und mit Beispielen. <span class="afb" style="background:var(--sky)">AFB II</span></span>
+    <b>auswerten</b><span>Daten, Versuche oder Grafiken beschreiben und daraus Schlüsse ziehen. <span class="afb" style="background:var(--sky)">AFB II–III</span></span>
+    <b>widerlegen</b><span>Mit Argumenten und Beispielen zeigen, dass eine Aussage falsch ist. <span class="afb" style="background:var(--lav)">AFB III</span></span>
+    <b>beurteilen</b><span>Einen Sachverhalt mit Fachwissen prüfen und zu einem begründeten Urteil kommen. <span class="afb" style="background:var(--lav)">AFB III</span></span>
+    <b>Stellung nehmen</b><span>Pro und Contra abwägen und eine eigene, begründete Meinung formulieren. <span class="afb" style="background:var(--lav)">AFB III</span></span>
+  </div>
+  <p style="font-size:15px;color:var(--muted)">AFB I = Wiedergeben · AFB II = Anwenden &amp; Erklären · AFB III = Beurteilen &amp; Problemlösen</p>
+  <button class="btn" onclick="closeModal('opModal')">Alles klar</button>
+</div></div>
+
+<script>
+/* ============================================================
+   Hilfsfunktionen
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const fmt = n => (Math.round(n*10)/10).toLocaleString('de-DE');
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function rng(seed){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647;}
+const norm = s => s.toLowerCase().replace(/[.,;:!?„“"'()\-–]/g,' ').replace(/\s+/g,' ').trim();
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+/* ============================================================
+   Abbildungen (eigene SVG-Zeichnungen)
+   ============================================================ */
+function mk(lab,x,y,tx,ty){
+  return `<line x1="${x}" y1="${y}" x2="${tx}" y2="${ty}" stroke="#4a4a68" stroke-width="1.6"/><circle cx="${tx}" cy="${ty}" r="3.2" fill="#4a4a68"/>
+  <circle cx="${x}" cy="${y}" r="14" fill="#fff" stroke="#4a4a68" stroke-width="2.2"/><text x="${x}" y="${y+5}" text-anchor="middle" font-family="Nunito,sans-serif" font-size="15" font-weight="800" fill="#4a4a68">${lab}</text>`;
+}
+function dots(cx,cy,R,n,excl,seed,rmin,rmax,fill,stroke){
+  const r=rng(seed);let out='',c=0,t=0;
+  while(c<n&&t<n*40){t++;const a=r()*Math.PI*2,d=Math.sqrt(r())*R,x=cx+Math.cos(a)*d,y=cy+Math.sin(a)*d;
+    if(excl.some(e=>Math.hypot(x-e[0],y-e[1])<e[2]))continue;const rr=rmin+r()*(rmax-rmin);
+    out+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr.toFixed(1)}" fill="${fill}" stroke="${stroke}" stroke-width=".7"/>`;c++;}
+  return out;
+}
+const T = (x,y,s,size=14,w=700,anchor='middle',fill='#4a4a68')=>`<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Nunito,sans-serif" font-size="${size}" font-weight="${w}" fill="${fill}">${s}</text>`;
+
+function cellBody(){
+  return `<rect x="70" y="80" width="380" height="170" rx="85" fill="#ece5ff" stroke="#b6a5ef" stroke-width="2" stroke-dasharray="6 5"/>
+  <rect x="88" y="98" width="344" height="134" rx="67" fill="#f5c08a"/>
+  <rect x="99" y="109" width="322" height="112" rx="56" fill="#e1f4da" stroke="#d07aa3" stroke-width="3"/>
+  <path d="M205 165 C 212 128, 245 205, 258 160 S 292 126, 302 170 S 334 204, 322 150 S 262 140, 243 178 S 202 196, 205 165" fill="none" stroke="#5a7fd8" stroke-width="3.2"/>
+  <path d="M225 150 C 240 140, 280 195, 290 150" fill="none" stroke="#5a7fd8" stroke-width="3"/>
+  <circle cx="372" cy="150" r="11" fill="none" stroke="#2f9c9c" stroke-width="3.2"/>
+  ${[[135,140],[152,196],[172,124],[345,128],[390,178],[402,140],[138,172],[332,204],[182,204],[285,122],[365,198],[118,155]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.8" fill="#c0587a"/>`).join('')}
+  <path d="M450 165 C 470 138, 490 192, 510 165 S 540 140, 556 160" fill="none" stroke="#e07a5f" stroke-width="3.2"/>`;
+}
+const FIG = {
+  cell(){return `<svg class="fig" viewBox="0 0 580 330">${cellBody()}
+    ${mk(1,120,32,150,84)}${mk(2,230,32,232,103)}${mk(3,330,32,330,110)}${mk(8,540,60,512,164)}
+    ${mk(4,190,300,248,170)}${mk(5,100,300,149,200)}${mk(6,300,300,300,208)}${mk(7,420,300,374,161)}</svg>`;},
+  shapes(){
+    const cocci=[[40,70],[56,62],[72,58],[88,62],[60,92],[76,90],[68,106],[84,104],[52,104]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="9" fill="#b9a6f2" stroke="#7d6bd6" stroke-width="2"/>`).join('');
+    const rod=(x,y,a)=>`<g transform="rotate(${a} ${x} ${y})"><path d="M${x+28} ${y} q 12 -6 22 2 M${x+28} ${y+4} q 14 4 22 -2" stroke="#7fb98a" stroke-width="1.6" fill="none"/><rect x="${x-28}" y="${y-10}" width="56" height="20" rx="10" fill="#bfe6c6" stroke="#4fae8a" stroke-width="2"/></g>`;
+    return `<svg class="fig" viewBox="0 0 580 200">
+      <g transform="translate(0,0)">${cocci}</g>
+      ${rod(200,62,-20)}${rod(215,105,10)}
+      <path d="M300 80 q 15 -30 30 0 t 30 0 t 30 0 t 30 0" fill="none" stroke="#e8946d" stroke-width="10" stroke-linecap="round"/>
+      <path d="M318 120 q 15 -24 30 0 t 30 0 t 30 0" fill="none" stroke="#e8946d" stroke-width="10" stroke-linecap="round"/>
+      <path d="M470 70 q 30 10 40 40" fill="none" stroke="#6aa6e0" stroke-width="16" stroke-linecap="round"/><path d="M510 110 q 4 20 22 26" stroke="#6aa6e0" stroke-width="1.8" fill="none"/>
+      <path d="M480 115 q 22 6 30 30" fill="none" stroke="#6aa6e0" stroke-width="14" stroke-linecap="round"/>
+      ${mk(1,65,175,65,125)}${mk(2,205,175,205,120)}${mk(3,360,175,360,132)}${mk(4,495,175,495,148)}</svg>`;
+  },
+  petri(){
+    const cx=175,cy=165;
+    return `<svg class="fig" viewBox="0 0 420 330">
+      <circle cx="${cx}" cy="${cy}" r="142" fill="#eef6fb" stroke="#9fb3c2" stroke-width="7"/>
+      <circle cx="${cx}" cy="${cy}" r="130" fill="#f8e3a3"/>
+      <circle cx="130" cy="130" r="56" fill="#fff8de"/>
+      ${dots(cx,cy,124,150,[[130,130,64]],7,2.5,6,'#e5b84f','#c4922f')}
+      <circle cx="248" cy="222" r="9" fill="#e5b84f" stroke="#c4922f" stroke-width="1"/>
+      <circle cx="130" cy="130" r="23" fill="#9cc7a5" stroke="#5f9a70" stroke-width="2"/>
+      ${dots(130,130,18,14,[],3,2,4,'#5f9a70','#4c7d5a')}
+      ${mk(1,380,40,132,128)}${mk(2,380,105,172,128)}${mk(3,380,175,252,222)}${mk(4,380,245,110,250)}${mk(5,380,305,268,272)}</svg>`;
+  },
+  attack(){
+    return `<svg class="fig" viewBox="0 0 580 300">${cellBody().replace('stroke-dasharray="6 5"','stroke-dasharray="6 5" opacity=".35"')}
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#d9536f"/></marker></defs>
+      <path d="M40 40 L 92 102" stroke="#d9536f" stroke-width="3.5" marker-end="url(#ar)"/>
+      <circle cx="390" cy="178" r="6.5" fill="#c0587a"/>
+      <path d="M520 280 L 397 185" stroke="#d9536f" stroke-width="3.5" marker-end="url(#ar)"/>
+      <path d="M260 290 L 262 188" stroke="#d9536f" stroke-width="3.5" marker-end="url(#ar)"/>
+      ${mk(1,30,30,30,30)}${mk(2,530,288,530,288)}${mk(3,260,292,260,292)}
+      ${T(12,320,'')}</svg>`;
+  },
+  resist(){
+    const box=(x,g,r,dead,lab,cap)=>{
+      const rr=rng(x+11);let s=`<rect x="${x}" y="30" width="128" height="120" rx="16" fill="#fff" stroke="#d9d3c6" stroke-width="2"/>${T(x+64,22,lab,17,800)}`;
+      const pos=[];for(let i=0;i<g+r+dead;i++){let px,py,ok=false,tr=0;while(!ok&&tr<200){tr++;px=x+14+rr()*100;py=44+rr()*92;ok=pos.every(p=>Math.hypot(p[0]-px,p[1]-py)>15);}pos.push([px,py]);}
+      pos.forEach((p,i)=>{if(i<g)s+=`<circle cx="${p[0]}" cy="${p[1]}" r="6.5" fill="#8fd4a8" stroke="#3fa97c" stroke-width="1.5"/>`;
+        else if(i<g+r)s+=`<rect x="${p[0]-6.5}" y="${p[1]-6.5}" width="13" height="13" rx="3" fill="#f2a1b4" stroke="#d9536f" stroke-width="1.5"/>`;
+        else s+=`<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="#eee" stroke="#bbb" stroke-width="1.2"/><path d="M${p[0]-4} ${p[1]-4}l8 8M${p[0]+4} ${p[1]-4}l-8 8" stroke="#999" stroke-width="1.4"/>`;});
+      if(cap)s+=T(x+64,168,cap,12,700,'middle','#7a7890');
+      return s;};
+    return `<svg class="fig" viewBox="0 0 580 215">
+      ${box(10,14,2,0,'A','')}${box(152,4,2,10,'B','💊 Einnahme')}${box(294,2,2,0,'C','')}${box(436,3,13,0,'D','')}
+      <circle cx="150" cy="198" r="6.5" fill="#8fd4a8" stroke="#3fa97c" stroke-width="1.5"/>${T(162,203,'empfindlich',13,700,'start')}
+      <rect x="262" y="191" width="13" height="13" rx="3" fill="#f2a1b4" stroke="#d9536f" stroke-width="1.5"/>${T(282,203,'resistent',13,700,'start')}
+      <circle cx="370" cy="198" r="6" fill="#eee" stroke="#bbb"/>${T(382,203,'abgestorben',13,700,'start')}</svg>`;
+  },
+  antibiogram(){
+    const cx=180,cy=165,zones=[[105,105,56],[258,98,9],[108,228,32],[255,228,43]];
+    let s=`<svg class="fig" viewBox="0 0 360 330"><circle cx="${cx}" cy="${cy}" r="148" fill="#eef6fb" stroke="#9fb3c2" stroke-width="7"/><circle cx="${cx}" cy="${cy}" r="137" fill="#f6dc93"/>`;
+    s+=dots(cx,cy,133,1300,zones.map(z=>[z[0],z[1],z[2]+3]),21,1.6,3.2,'#e3b24a','#c79432');
+    zones.forEach((z,i)=>{s+=`<circle cx="${z[0]}" cy="${z[1]}" r="${z[2]}" fill="#fff6d9" opacity=".9"/>`;});
+    s+=[[268,212],[240,247],[262,250]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4.2" fill="#e3b24a" stroke="#a67516" stroke-width="1"/>`).join('');
+    'ABCD'.split('').forEach((L,i)=>{const z=zones[i];s+=`<circle cx="${z[0]}" cy="${z[1]}" r="11" fill="#fff" stroke="#888" stroke-width="1.5"/>${T(z[0],z[1]+5,L,13,800)}`;});
+    return s+'</svg>';
+  },
+  growthGraphs(){
+    const ax=(x)=>`<rect x="${x}" y="10" width="160" height="140" rx="12" fill="#fff" stroke="#e3ddd0"/><path d="M${x+22} 130 H ${x+150} M${x+22} 130 V 22" stroke="#4a4a68" stroke-width="2"/>${T(x+86,146,'Zeit',11,700)}${T(x+14,76,'Anzahl',11,700,'middle').replace('<text','<text transform="rotate(-90 '+(x+14)+' 76)"')}`;
+    let s=`<svg class="fig" viewBox="0 0 540 190">`;
+    s+=ax(10)+`<path d="M32 125 L 150 40" stroke="#7d6bd6" stroke-width="3" fill="none"/>`+T(90,178,'A',16,800);
+    s+=ax(190)+`<path d="M212 122 C 260 120, 300 60, 330 58" stroke="#7d6bd6" stroke-width="3" fill="none"/>`+T(270,178,'B',16,800);
+    let p='M392 127';for(let i=1;i<=24;i++){const x=392+i*5.4,y=127-Math.pow(2,i/3.4)*.95;p+=` L ${x.toFixed(1)} ${Math.max(24,y).toFixed(1)}`;}
+    s+=ax(370)+`<path d="${p}" stroke="#7d6bd6" stroke-width="3" fill="none"/>`+T(450,178,'C',16,800);
+    return s+'</svg>';
+  },
+  stopCurve(){
+    const X=d=>60+d*44, Y=v=>220-v*1.8;
+    const pts=[[0,95],[1,60],[2,30],[3,14],[4,16],[5,26],[6,44],[7,66],[8,86],[9,98],[10,104]];
+    let p='M'+pts.map(q=>X(q[0])+' '+Y(q[1])).join(' L ');
+    let s=`<svg class="fig" viewBox="0 0 540 280"><rect x="${X(0)}" y="20" width="${X(3)-X(0)}" height="200" fill="#e4ddff" opacity=".6"/>
+      ${T((X(0)+X(3))/2,36,'Einnahme',13,800,'middle','#7d6bd6')}
+      <path d="M${X(3)} 20 V 220" stroke="#d9536f" stroke-width="2" stroke-dasharray="6 5"/>${T(X(3)+4,54,'Abbruch',12,800,'start','#d9536f')}
+      <path d="M${X(7)} 20 V 220" stroke="#4fae8a" stroke-width="2" stroke-dasharray="6 5"/>${T(X(7)+4,36,'verordnetes Ende',12,800,'start','#4fae8a')}
+      <path d="M60 220 H 510 M60 220 V 15" stroke="#4a4a68" stroke-width="2"/>
+      ${[0,1,2,3,4,5,6,7,8,9,10].map(d=>T(X(d),238,d,12,700)).join('')}${T(285,262,'Tage nach Behandlungsbeginn',13,800)}
+      ${T(20,120,'Anzahl Bakterien',12,800).replace('<text','<text transform="rotate(-90 20 120)"')}
+      <path d="${p}" stroke="#e2825a" stroke-width="4" fill="none" stroke-linejoin="round"/>
+      ${pts.map(q=>`<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="4" fill="#e2825a"/>`).join('')}</svg>`;
+    return s;
+  },
+  swan(){
+    const flask=(x,broken,turbid,cap)=>{
+      let s=`<circle cx="${x}" cy="150" r="50" fill="${turbid?'#e8d48f':'#eaf6fb'}" stroke="#7e95a5" stroke-width="3"/>`;
+      if(turbid)s+=dots(x,150,42,40,[],x,1.5,3,'#b9952e','#9a7a20');
+      if(!broken)s+=`<path d="M${x-8} 103 V 70 C ${x-8} 30, ${x+60} 30, ${x+60} 70 C ${x+60} 90, ${x+80} 95, ${x+90} 60" fill="none" stroke="#7e95a5" stroke-width="12" stroke-linecap="round"/><path d="M${x-8} 103 V 70 C ${x-8} 30, ${x+60} 30, ${x+60} 70 C ${x+60} 90, ${x+80} 95, ${x+90} 60" fill="none" stroke="#f4fbfe" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="${x+58}" cy="84" r="3" fill="#8a7a5a"/><circle cx="${x+63}" cy="90" r="2.5" fill="#8a7a5a"/>`;
+      else s+=`<path d="M${x-6} 103 V 78" stroke="#7e95a5" stroke-width="12" stroke-linecap="round"/><path d="M${x-6} 103 V 78" stroke="#f4fbfe" stroke-width="6"/>
+        ${[[-20,40],[5,30],[20,52],[-8,58]].map(p=>`<circle cx="${x+p[0]}" cy="${p[1]}" r="2.6" fill="#8a7a5a"/>`).join('')}`;
+      return s+T(x+20,225,cap,13,800);};
+    return `<svg class="fig" viewBox="0 0 520 240">${flask(110,false,false,'Hals intakt: nach Wochen klar')}${flask(370,true,true,'Hals abgebrochen: nach Tagen trüb')}</svg>`;
+  },
+  heroArt(){
+    return `<svg class="fig" viewBox="0 0 580 300" style="background:transparent">${cellBody().replace(/(<rect x="70")/,'$1')}${T(290,290,'Bakterienzelle (vereinfacht)',14,800,'middle','#7a7890')}</svg>`;
+  }
+};
+
+/* ============================================================
+   Themen & Spickzettel
+   ============================================================ */
+const CATS = {
+  bak:{n:'Bakterien',ic:'🦠',bg:'var(--mint)',d:'var(--mint-d)'},
+  pio:{n:'Pioniere der Mikrobiologie',ic:'🔬',bg:'var(--lav)',d:'var(--lav-d)'},
+  ab:{n:'Antibiotika',ic:'💊',bg:'var(--sky)',d:'var(--sky-d)'},
+  sal:{n:'Salmonellose',ic:'🍗',bg:'var(--peach)',d:'var(--peach-d)'},
+  stb:{n:'Steckbrief erstellen',ic:'📝',bg:'var(--butter)',d:'var(--butter-d)'}
+};
+const SPICK = {
+bak:`<ul>
+<li><b>Bakterien</b> sind einzellige Lebewesen, etwa 0,5–5 µm (Mikrometer) groß → nur unter dem Mikroskop sichtbar.</li>
+<li>Sie sind <b>Prokaryoten</b>: kein echter Zellkern. Die ringförmige <b>Erbsubstanz (DNA)</b> liegt frei im Zellplasma.</li>
+<li><b>Bau:</b> Schleimhülle (Schutz vor Austrocknung und Immunsystem) · Zellwand (Form, Stabilität) · Zellmembran (regelt den Stoffaustausch) · Zellplasma · Ribosomen (stellen Eiweiße her) · Plasmide (kleine DNA-Ringe, z. B. mit Resistenz-Genen) · Geißel (Fortbewegung).</li>
+<li><b>Formen:</b> Kugelbakterien (Kokken), Stäbchenbakterien (Bazillen), Schraubenbakterien (Spirillen), kommaförmige Bakterien.</li>
+<li><b>Vermehrung durch Teilung:</b> Zelle wächst → Erbsubstanz wird verdoppelt → Zelle schnürt sich ein → zwei gleiche Tochterzellen. Bei Wärme, Feuchtigkeit und Nahrung alle 20–30 Minuten → <b>exponentielles Wachstum</b> (1 → 2 → 4 → 8 → 16 …).</li>
+<li>Kälte <b>bremst</b> die Vermehrung, starke Hitze <b>tötet</b> die meisten Bakterien.</li>
+<li>Nur etwa <b>1 %</b> der Bakterien macht Menschen krank. <b>Nützlich:</b> Zersetzer im Boden (bauen tote Pflanzen und Tiere ab → Nährstoffe, fruchtbarer Boden), Darmbakterien (Verdauung, Schutz), Joghurt, Käse, Sauerkraut, Kläranlagen.</li>
+<li><b>Schädlich:</b> Manche bilden Giftstoffe (<b>Toxine</b>) → Fieber, Durchfall, Krankheiten wie Tetanus, Salmonellose, Tuberkulose.</li></ul>`,
+pio:`<ul>
+<li><b>Robert Koch</b> (1843–1910), deutscher Arzt: bewies, dass ein <b>bestimmtes Bakterium</b> eine <b>bestimmte Krankheit</b> auslöst (Milzbrand 1876, Tuberkulose 1882, Cholera 1884) · entwickelte <b>Färbemethoden</b> · fester <b>Nährboden</b> (Agar aus Algen) → Bakterien wachsen als <b>Kolonien</b>. Sein Mitarbeiter <b>Julius Petri</b> erfand die Petrischale. <b>Nobelpreis 1905</b> (für den Tuberkulose-Erreger).</li>
+<li><b>Louis Pasteur</b> (1822–1895), französischer Chemiker: Mikroorganismen verursachen <b>Gärung, Fäulnis und Krankheiten</b> und entstehen <b>nicht von selbst</b>, sondern gelangen von außen (z. B. über die Luft) hinein · <b>Pasteurisieren</b>: Milch kurz erhitzen (ca. 72 °C) → die meisten Krankheitserreger sterben, Milch bleibt länger haltbar · <b>Impfstoffe</b> (Milzbrand, Tollwut 1885) · Einsatz für Hygiene.</li>
+<li><b>Alexander Fleming</b> (1881–1955), schottischer Arzt: 1928 Schimmelpilz <b>Penicillium</b> in einer Schale mit Staphylokokken → bakterienfreier <b>Hemmhof</b> → Stoff <b>Penicillin</b> (1929 veröffentlicht). 1939 reinigen <b>Florey und Chain</b> das Penicillin, 1941 erster Patient, ab 1943/44 Massenproduktion, <b>1945 Nobelpreis</b> für alle drei.</li>
+<li><b>Merke:</b> Koch zeigte, <i>welche</i> Bakterien krank machen – Pasteur, <i>wie man sich schützt</i> – Fleming fand ein <i>Heilmittel</i>.</li></ul>`,
+ab:`<ul>
+<li><b>Antibiotika</b> (griech. anti = gegen, bios = Leben) sind Wirkstoffe, die <b>Bakterien abtöten oder ihre Vermehrung hemmen</b>. Ursprünglich stammen sie aus Pilzen oder Bakterien.</li>
+<li><b>Angriffspunkte:</b> Aufbau der Zellwand (Zelle platzt) · Ribosomen (keine Eiweiße) · Kopieren der Erbsubstanz (keine Teilung). Unsere Körperzellen haben keine Zellwand und andere Ribosomen → kaum geschädigt.</li>
+<li><b>Nicht gegen Viren!</b> Viren sind keine Zellen: keine Zellwand, keine Ribosomen, kein eigener Stoffwechsel, sie vermehren sich in unseren Zellen → kein Angriffspunkt (z. B. Erkältung, Grippe).</li>
+<li><b>Nebenwirkung Durchfall:</b> Antibiotika unterscheiden nicht zwischen „guten“ und „schlechten“ Bakterien und töten auch nützliche Darmbakterien.</li>
+<li><b>Resistenz</b> = Bakterien sind widerstandsfähig, das Antibiotikum wirkt nicht mehr. Ablauf: zufällige <b>Mutationen</b> → Antibiotikum tötet empfindliche Bakterien → resistente überleben (<b>Selektion</b>) → sie vermehren sich. Resistenz-Gene können weitergegeben werden. Gegen viele Antibiotika resistent: <b>multiresistente Keime</b> (z. B. MRSA).</li>
+<li><b>Ursachen:</b> Einnahme bei Virusinfektionen, zu früher Abbruch, Masseneinsatz in der Tierhaltung.</li>
+<li><b>Regeln:</b> nur ärztlich verordnet · genau nach Anweisung (Menge, Zeitabstände, Dauer bis zum Ende) · Reste nie aufheben oder weitergeben → Apotheke/Restmüll · Hygiene und Impfungen senken den Bedarf.</li></ul>`,
+sal:`<ul>
+<li><b>Erreger:</b> Salmonellen – stäbchenförmige Bakterien mit Geißeln. Sie leben im Darm von Tieren, vor allem von Geflügel.</li>
+<li><b>Ansteckung:</b> vor allem über Lebensmittel: rohe Eier und Speisen daraus (Tiramisu, Mayonnaise), nicht durchgegartes Geflügel, Hackfleisch/Mett, Rohmilch. Außerdem <b>Schmierinfektion</b> über Hände, Küchenbretter, Auftauwasser.</li>
+<li><b>Inkubationszeit:</b> 6–72 Stunden (meist 12–36 Stunden).</li>
+<li><b>Symptome:</b> plötzlicher Durchfall, Bauchschmerzen, Übelkeit, Erbrechen, Fieber, Kopfschmerzen.</li>
+<li><b>Behandlung:</b> viel trinken (Flüssigkeit und Salze ersetzen), Schonkost. Antibiotika nur bei schweren Verläufen (z. B. Säuglinge, alte oder geschwächte Menschen).</li>
+<li><b>Vorbeugung:</b> Kühlschrank/Kühlkette · Fleisch und Eier durchgaren (mind. 70 °C mehrere Minuten) · Auftauwasser sofort wegschütten · Hände, Bretter und Messer reinigen · Speisen nicht lauwarm stehen lassen (nicht unter 60 °C warmhalten).</li>
+<li><b>Achtung:</b> Einfrieren tötet Salmonellen <b>nicht</b> ab! Verdorbene Lebensmittel sehen und riechen oft ganz normal.</li></ul>`,
+stb:`<ul>
+<li><b>1 Text lesen:</b> zweimal genau lesen, unbekannte Wörter klären.</li>
+<li><b>2 Legende anlegen:</b> jede Kategorie bekommt eine eigene Farbe: <span style="background:#fbe9a6;padding:0 5px;border-radius:5px">Ansteckung</span> <span style="background:#cfe7fb;padding:0 5px;border-radius:5px">Erreger</span> <span style="background:#e1d3f7;padding:0 5px;border-radius:5px">Inkubationszeit</span> <span style="background:#d6ebc8;padding:0 5px;border-radius:5px">Symptome</span> <span style="background:#f6cfd6;padding:0 5px;border-radius:5px">Behandlung</span></li>
+<li><b>3 Markieren:</b> nur <b>Schlüsselwörter</b>, keine ganzen Sätze. Weniger ist mehr!</li>
+<li><b>4 Steckbrief füllen:</b> Infos in <b>Stichpunkten</b> übertragen, übersichtlich (Tabelle), Überschrift = Name der Krankheit, Fachbegriffe verwenden.</li>
+<li><b>Nicht in den Steckbrief:</b> Geschichten, Beispiele von Personen, Jahreszahlen, woher der Name kommt, wie häufig die Krankheit früher war.</li>
+<li><b>Achtung Falle:</b> Vorbeugung/Schutz (z. B. Impfung) ist <b>nicht</b> dasselbe wie Behandlung!</li>
+<li><b>Inkubationszeit</b> = Zeit zwischen Ansteckung und den ersten Krankheitszeichen.</li></ul>`
+};
+
+/* ============================================================
+   AUFGABEN
+   Typen: mc, multi, tf, order, match, label, cat, cloze, num, free, sbform, mark
+   "+" am Anfang einer Antwort = richtig (Reihenfolge wird zufällig gemischt)
+   ============================================================ */
+const LEG = [['Ansteckung','#fbe9a6'],['Erreger','#cfe7fb'],['Inkubationszeit','#e1d3f7'],['Symptome','#d6ebc8'],['Behandlung','#f6cfd6']];
+const TASKS = [
+/* ---------------------- BAKTERIEN ---------------------- */
+{id:'b1',c:'bak',a:1,type:'mc',p:1,q:'Bakterien gehören zu den <b>Prokaryoten</b>. Was bedeutet das?',
+ o:['Sie bestehen aus vielen Zellen.','Sie besitzen keine Zellwand.','+Sie haben keinen echten Zellkern, ihre Erbsubstanz liegt frei im Zellplasma.','Sie können sich nur in fremden Zellen vermehren.'],
+ e:'Prokaryoten haben keinen Zellkern. Die ringförmige DNA liegt frei im Zellplasma. Nur in fremden Zellen vermehren sich <i>Viren</i>.'},
+{id:'b2',c:'bak',a:1,type:'label',p:4,fig:'cell',q:'<b>Beschrifte</b> die Bakterienzelle. Achtung: Es gibt Begriffe, die nicht in eine Bakterienzelle gehören!',
+ l:['Schleimhülle','Zellwand','Zellmembran','Erbsubstanz (DNA)','Ribosomen','Zellplasma','Plasmid','Geißel'],x:['Zellkern','Chloroplast','Mitochondrium'],
+ e:'Bakterien besitzen <b>keinen Zellkern</b>, keine Chloroplasten und keine Mitochondrien. Von außen nach innen: Schleimhülle → Zellwand → Zellmembran → Zellplasma mit Erbsubstanz, Ribosomen und Plasmiden.'},
+{id:'b3',c:'bak',a:1,type:'match',p:3,q:'<b>Ordne</b> jedem Bauteil der Bakterienzelle seine Aufgabe zu.',
+ pairs:[['Zellwand','gibt der Zelle Form und Stabilität'],['Zellmembran','regelt, welche Stoffe in die Zelle hinein- und hinausgelangen'],['Geißel','dient der Fortbewegung'],['Ribosomen','stellen Eiweiße (Proteine) her'],['Schleimhülle','schützt vor Austrocknung und vor dem Immunsystem'],['Plasmid','kleiner DNA-Ring, kann z. B. Resistenz-Gene tragen']],
+ x:['steuert als Zellkern alle Vorgänge der Zelle'],e:'Der Zellkern ist eine Falle: Bakterien haben keinen!'},
+{id:'b4',c:'bak',a:1,type:'label',p:2,fig:'shapes',q:'<b>Benenne</b> die vier Bakterienformen.',
+ l:['Kugelbakterien (Kokken)','Stäbchenbakterien (Bazillen)','Schraubenbakterien (Spirillen)','kommaförmige Bakterien'],x:['Viren','Pilzfäden'],
+ e:'Kokken sind rund (oft in Ketten oder Haufen), Bazillen länglich, Spirillen schraubenförmig. Der Cholera-Erreger ist ein kommaförmiges Bakterium.'},
+{id:'b5',c:'bak',a:1,type:'tf',p:3,q:'<b>Entscheide:</b> richtig oder falsch?',
+ s:[['Bakterien bestehen aus nur einer einzigen Zelle.',true,''],['Die meisten Bakterien machen Menschen krank.',false,'Nur etwa 1 % der Bakterien löst Krankheiten aus.'],['Bakterien vermehren sich durch Teilung.',true,''],['Kälte tötet Bakterien zuverlässig ab.',false,'Kälte bremst die Vermehrung nur. Hitze tötet die meisten Bakterien ab.'],['In unserem Darm leben Billionen Bakterien.',true,''],['Bakterien sind so groß, dass man sie mit einer Lupe gut erkennt.',false,'Bakterien sind nur 0,5–5 µm groß, man braucht ein Mikroskop.']]},
+{id:'b6',c:'bak',a:1,type:'order',p:2,q:'<b>Bringe</b> die Schritte der Bakterienteilung in die richtige Reihenfolge.',
+ items:['Die Zelle nimmt Nahrung auf und wächst.','Die Erbsubstanz wird verdoppelt.','Die Zelle schnürt sich in der Mitte ein.','Zwei gleiche Tochterzellen trennen sich.'],
+ e:'Erst Wachstum, dann wird die DNA verdoppelt, damit jede Tochterzelle eine vollständige Kopie bekommt. Dann Einschnürung und Trennung.'},
+{id:'b7',c:'bak',a:2,type:'cat',p:4,q:'<b>Ordne zu:</b> nützlich oder schädlich für den Menschen?',
+ b:['nützlich','schädlich'],items:[['Milchsäurebakterien machen aus Milch Joghurt.',0],['Bakterien im Boden zersetzen herabgefallenes Laub.',0],['Salmonellen in einer Mayonnaise aus rohen Eiern.',1],['Darmbakterien helfen bei der Verdauung.',0],['Tetanus-Bakterien gelangen in eine verschmutzte Wunde.',1],['Bakterien in der Kläranlage reinigen das Abwasser.',0],['Streptokokken lösen eine eitrige Mandelentzündung aus.',1],['Bakterien bilden Giftstoffe (Toxine) im Körper.',1]],
+ e:'Zersetzer (Destruenten) bauen tote Pflanzen und Tiere ab. So kommen Nährstoffe in den Boden zurück, und der Boden bleibt fruchtbar.'},
+{id:'b8',c:'bak',a:2,type:'num',p:2,q:'Ein Bakterium teilt sich unter guten Bedingungen alle <b>20 Minuten</b>. <b>Berechne</b>, wie viele Bakterien nach <b>2 Stunden</b> aus einem einzigen Bakterium entstanden sind.',ans:64,unit:'Bakterien',
+ e:'2 Stunden = 120 Minuten = 6 Teilungen. 1 → 2 → 4 → 8 → 16 → 32 → <b>64</b> (also 2<sup>6</sup>).'},
+{id:'b9',c:'bak',a:3,type:'num',p:3,q:'In einem Topf Reis befinden sich <b>50</b> Bakterien. Der Reis bleibt <b>4 Stunden</b> lauwarm auf dem Herd stehen. Die Bakterien teilen sich alle <b>30 Minuten</b>. Wie viele Bakterien sind es danach?',ans:12800,unit:'Bakterien',
+ e:'4 Stunden = 8 Teilungen. 2<sup>8</sup> = 256. 50 · 256 = <b>12 800</b>. Deshalb sollte man Essen schnell abkühlen und in den Kühlschrank stellen.'},
+{id:'b10',c:'bak',a:2,type:'free',p:3,q:'Ella sieht auf ihrem Joghurtbecher „mit lebenden Bakterienkulturen“ und ruft: „Igitt! Bakterien sind doch immer gefährlich!“<br><b>Widerlege</b> Ellas Aussage. Erkläre dazu mindestens <b>zwei</b> nützliche Rollen von Bakterien in der Natur oder für den Menschen.',
+ pts:[{t:'Nur ein sehr kleiner Teil (ca. 1 %) der Bakterien macht krank, die meisten sind harmlos oder nützlich.',kw:['1 %','1%','ein prozent','wenige','die meisten','harmlos']},{t:'Beispiel Natur: Bakterien zersetzen tote Pflanzen/Tiere (Destruenten) → Nährstoffe gelangen in den Boden, Boden wird fruchtbar.',kw:['zersetz','abbau','boden','nährstoff','destruent','laub','fruchtbar']},{t:'Beispiel Mensch: Darmbakterien helfen bei der Verdauung ODER Bakterien werden für Lebensmittel wie Joghurt, Käse, Sauerkraut genutzt.',kw:['darm','verdau','joghurt','käse','sauerkraut','milchsäure']}],
+ m:'Ellas Aussage stimmt nicht. Nur etwa 1 % der Bakterien macht Menschen krank. Viele Bakterien sind sogar sehr nützlich: Im Boden zersetzen sie tote Pflanzen und Tiere. Dadurch gelangen Nährstoffe zurück in den Boden, und Pflanzen können wachsen. In unserem Darm helfen Bakterien bei der Verdauung. Und ohne Milchsäurebakterien gäbe es keinen Joghurt.'},
+{id:'b11',c:'bak',a:2,type:'multi',p:3,q:'<b>Vergleich Bakterien – Viren:</b> Wähle <b>alle</b> richtigen Aussagen aus.',
+ o:['+Bakterien haben einen eigenen Stoffwechsel, Viren nicht.','Viren sind größer als Bakterien.','+Viren können sich nur in Wirtszellen vermehren.','Viren und Bakterien besitzen beide Ribosomen.','+Bakterien vermehren sich selbstständig durch Teilung.','Viren besitzen eine feste Zellwand.'],
+ e:'Viren sind viel kleiner, keine echten Zellen, haben keine Ribosomen, keine Zellwand und keinen Stoffwechsel.'},
+{id:'b12',c:'bak',a:2,type:'cloze',p:3,q:'<b>Vervollständige</b> den Text zum Bau der Bakterienzelle.',
+ t:'Bakterien sind Prokaryoten. Sie haben keinen [Zellkern|Zellplasma|Ribosomen]. Ihre ringförmige [Erbsubstanz|Zellwand|Geißel] liegt frei im Zellplasma. Außen gibt die [Zellwand|Zellmembran|Schleimhülle] der Zelle Form und Stabilität. Darunter liegt die [Zellmembran|Schleimhülle|Geißel], die den Stoffaustausch regelt. Eiweiße werden an den [Ribosomen|Plasmiden|Geißeln] hergestellt. Kleine DNA-Ringe heißen [Plasmide|Ribosomen|Kokken]. Zur Fortbewegung nutzen viele Bakterien eine [Geißel|Zellwand|Kapsel].'},
+{id:'b13',c:'bak',a:3,type:'mc',p:3,fig:'growthGraphs',q:'Welcher Graph zeigt das Wachstum einer Bakterienkultur unter idealen Bedingungen (genug Nahrung, Wärme, Platz) am besten? <b>Begründe</b> für dich, bevor du klickst.',
+ o:['Graph A – die Anzahl steigt jede Minute um gleich viele Bakterien.','Graph B – das Wachstum ist am Anfang schnell und wird dann immer langsamer.','+Graph C – erst langsam, dann immer schneller, weil sich die Anzahl bei jeder Teilung verdoppelt.','Keiner – Bakterien vermehren sich gleichmäßig nur einmal am Tag.'],
+ e:'Bei jeder Teilung verdoppelt sich die Anzahl: 1, 2, 4, 8, 16, 32 … Die Kurve wird immer steiler. Das nennt man <b>exponentielles Wachstum</b>.'},
+{id:'b14',c:'bak',a:3,type:'free',p:3,q:'Im Kühlschrank bleibt Hackfleisch länger frisch. Trotzdem gilt: Einfrieren tötet Bakterien meist nicht ab, gründliches Erhitzen schon.<br><b>Erkläre</b> diese drei Beobachtungen mit deinem Wissen über Bakterien.',
+ pts:[{t:'Kälte (Kühlschrank) verlangsamt den Stoffwechsel/die Teilung der Bakterien → sie vermehren sich kaum.',kw:['langsam','bremst','verlangsam','weniger teil','kaum','hemm']},{t:'Beim Einfrieren überleben die Bakterien. Nach dem Auftauen vermehren sie sich wieder.',kw:['überleben','auftau','wieder','nicht tot','nicht abgetötet']},{t:'Starke Hitze tötet die Bakterien ab (Zellbestandteile/Eiweiße werden zerstört).',kw:['hitze','erhitz','abgetötet','sterben','tötet','zerstört','eiweiß']}],
+ m:'Im Kühlschrank ist es kalt. Kälte bremst den Stoffwechsel und die Teilung der Bakterien, deshalb vermehren sie sich kaum und das Fleisch verdirbt langsamer. Beim Einfrieren sterben die meisten Bakterien aber nicht. Sie überleben und vermehren sich nach dem Auftauen weiter. Starke Hitze dagegen zerstört die Bakterienzellen (z. B. ihre Eiweiße), dadurch sterben sie ab.'},
+{id:'b15',c:'bak',a:2,type:'mc',p:2,q:'Forschende finden ein unbekanntes Lebewesen: <b>einzellig</b>, mit <b>Zellwand</b>, Erbsubstanz <b>frei im Zellplasma</b>, <b>keine Mitochondrien</b>. Worum handelt es sich am wahrscheinlichsten?',
+ o:['um ein Virus','um eine Pflanzenzelle','um eine Hefezelle (Pilz)','+um ein Bakterium'],
+ e:'Pflanzen- und Pilzzellen haben auch eine Zellwand, aber einen echten Zellkern und Mitochondrien. Viren sind gar keine Zellen. Nur Bakterien passen.'},
+{id:'b16',c:'bak',a:3,type:'mc',p:2,q:'Warum sind <b>Plasmide</b> bei Krankheitserregern besonders gefährlich?',
+ o:['Sie produzieren das Gift, das Fieber auslöst.','Sie zerstören die Zellwand anderer Bakterien.','+Sie können Resistenz-Gene tragen und an andere Bakterien weitergegeben werden.','Sie verwandeln Bakterien in Viren.'],
+ e:'Plasmide sind kleine DNA-Ringe. Bakterien können sie untereinander austauschen. So kann sich eine Antibiotika-Resistenz schnell verbreiten.'},
+
+/* ---------------------- PIONIERE ---------------------- */
+{id:'p1',c:'pio',a:1,type:'match',p:3,q:'<b>Ordne</b> jeder Person ihre wichtigste Leistung zu.',
+ pairs:[['Robert Koch','bewies, dass ein bestimmtes Bakterium eine bestimmte Krankheit auslöst'],['Louis Pasteur','entwickelte das Verfahren, Milch durch kurzes Erhitzen haltbar zu machen'],['Alexander Fleming','entdeckte 1928 die bakterientötende Wirkung eines Schimmelpilzes'],['Julius Petri','erfand die flache Glasschale mit Deckel'],['Howard Florey & Ernst Chain','reinigten Penicillin und machten es als Medikament nutzbar']],
+ x:['erfand das erste Mikroskop'],e:'Das Mikroskop wurde lange vor diesen Forschern erfunden.'},
+{id:'p2',c:'pio',a:1,type:'cat',p:4,q:'<b>Ordne</b> die Fakten dem richtigen Forscher zu.',
+ b:['Koch','Pasteur','Fleming'],items:[['entdeckte 1882 den Erreger der Tuberkulose',0],['war ein französischer Chemiker',1],['war ein schottischer Arzt',2],['entwickelte eine Impfung gegen Tollwut (1885)',1],['machte Bakterien mit Farbstoffen sichtbar',0],['fand einen Schimmelpilz in einer Staphylokokken-Schale',2],['bewies, dass Gärung und Fäulnis durch Mikroorganismen entstehen',1],['in seinem Labor wurde der feste Nährboden Agar eingeführt',0],['erhielt 1905 den Nobelpreis',0],['erhielt 1945 gemeinsam mit zwei Kollegen den Nobelpreis',2]],
+ e:'Pasteur bekam übrigens nie den Nobelpreis: Er starb 1895, den Nobelpreis gibt es erst seit 1901.'},
+{id:'p3',c:'pio',a:1,type:'order',p:3,q:'<b>Ordne</b> die Geschichte des Penicillins zeitlich.',
+ items:['1928: Fleming entdeckt den Schimmelpilz in der Petrischale.','1929: Fleming veröffentlicht seine Beobachtung.','1939: Florey und Chain beginnen, Penicillin zu reinigen.','1941: Ein Polizist wird als erster Mensch mit Penicillin behandelt.','1943/44: Massenproduktion in großen Gärtanks in den USA.','1945: Fleming, Florey und Chain erhalten den Nobelpreis.'],
+ e:'Zwischen Entdeckung und Massenproduktion lagen rund 15 Jahre. Fleming konnte den Wirkstoff selbst nicht rein herstellen.'},
+{id:'p4',c:'pio',a:1,type:'label',p:3,fig:'petri',q:'<b>Beschrifte</b> die Abbildung von Flemings Beobachtung.',
+ l:['Schimmelpilz (Penicillium)','Hemmhof (bakterienfreie Zone)','Bakterienkolonie','Nährboden','Petrischale'],x:['Zellkern','Virus','Ribosom'],
+ e:'Der Pilz gibt einen Wirkstoff ab, der sich im Nährboden ausbreitet. In der Nähe des Pilzes ist die Konzentration hoch genug, um die Bakterien abzutöten → Hemmhof.'},
+{id:'p5',c:'pio',a:2,type:'cloze',p:3,q:'<b>Vervollständige</b> den Text zum Pasteurisieren.',
+ t:'Das Pasteurisieren ist nach dem [französischen|deutschen|schottischen] Forscher [Louis Pasteur|Robert Koch|Alexander Fleming] benannt. Dabei wird Milch kurz auf etwa [72 °C|37 °C|150 °C] erhitzt. Dadurch sterben [die meisten|alle|keine] Krankheitserreger ab. Die Milch bleibt so [länger haltbar|für immer haltbar|nur einen Tag frisch]. Pasteur hatte bewiesen, dass Mikroorganismen [nicht von selbst entstehen|von selbst in der Milch entstehen|nur im Wasser leben], sondern von außen hineingelangen.'},
+{id:'p6',c:'pio',a:2,type:'free',p:3,q:'Dein kleiner Bruder fragt beim Frühstück: „Auf der Milch steht <i>pasteurisiert</i>. Ist da Paste drin?“<br><b>Schreibe deine Antwort</b> auf. Erkläre, was Pasteurisieren bedeutet, wozu es dient und woher der Name kommt.',
+ pts:[{t:'Milch wird kurz erhitzt (ca. 72 °C).',kw:['erhitz','heiß','warm','72','grad']},{t:'Dabei sterben die meisten Krankheitserreger/Mikroorganismen ab → Milch ist länger haltbar/sicherer.',kw:['sterben','abgetötet','tötet','keime','erreger','bakterien','haltbar']},{t:'Der Name kommt vom Forscher Louis Pasteur.',kw:['pasteur']}],
+ m:'„Nein, das hat nichts mit Paste zu tun! Pasteurisieren heißt, dass die Milch kurz auf etwa 72 °C erhitzt wird. Dabei sterben die meisten Krankheitserreger ab, und die Milch hält länger. Der Name kommt von dem französischen Forscher Louis Pasteur, der dieses Verfahren entwickelt hat.“'},
+{id:'p7',c:'pio',a:2,type:'tf',p:3,q:'<b>Entscheide:</b> richtig oder falsch?',
+ s:[['Robert Koch hat die Petrischale erfunden.',false,'Das war sein Mitarbeiter Julius Petri.'],['Pasteur zeigte, dass Mikroorganismen nicht von selbst entstehen.',true,''],['Fleming stellte Penicillin selbst in großen Mengen her.',false,'Er konnte es nicht rein herstellen. Das schafften Florey und Chain, die Massenproduktion kam später in den USA.'],['Vor 150 Jahren glaubten viele, Krankheiten entstünden durch „schlechte Luft“.',true,''],['Der Nährboden Agar wird aus Algen gewonnen.',true,''],['Louis Pasteur erhielt den Nobelpreis für das Pasteurisieren.',false,'Pasteur starb 1895, den Nobelpreis gibt es erst seit 1901.']]},
+{id:'p8',c:'pio',a:2,type:'mc',p:2,q:'Warum war Kochs <b>Färbemethode</b> so ein großer Fortschritt?',
+ o:['Gefärbte Bakterien werden harmlos.','Die Farbstoffe töten die Bakterien sofort ab.','+Bakterien sind fast durchsichtig. Durch das Anfärben kann man sie unter dem Mikroskop erkennen und unterscheiden.','Durch das Färben werden die Bakterien größer.'],
+ e:'Erst mit Farbstoffen traten die winzigen, fast durchsichtigen Zellen unter dem Mikroskop deutlich hervor.'},
+{id:'p9',c:'pio',a:2,type:'mc',p:2,q:'Warum war ein <b>fester Nährboden</b> besser als eine flüssige Nährbrühe?',
+ o:['Auf festem Nährboden wachsen Bakterien schneller.','+Auf festem Nährboden wachsen Bakterien als getrennte Häufchen (Kolonien), sodass man eine einzelne Bakterienart untersuchen kann.','Fester Nährboden tötet Krankheitserreger ab.','In einer Nährbrühe können Bakterien überhaupt nicht wachsen.'],
+ e:'In einer Brühe vermischen sich alle Bakterienarten. Auf festem Agar entsteht aus einem Bakterium eine eigene Kolonie. So konnte Koch einzelne Erreger untersuchen und bestimmten Krankheiten zuordnen.'},
+{id:'p10',c:'pio',a:3,type:'mc',p:3,fig:'swan',q:'Pasteur kochte Nährbrühe in zwei Glaskolben ab. Bei Kolben 1 hat der Hals eine lange Biegung: Luft kann hinein, Staub bleibt aber in der Biegung hängen. Bei Kolben 2 brach er den Hals ab.<br><b>Was beweist dieser Versuch?</b>',
+ o:['Luft allein lässt Nährbrühe verderben.','+Mikroorganismen entstehen nicht von selbst in der Brühe, sondern gelangen von außen (z. B. mit Staub aus der Luft) hinein.','Durch Kochen entstehen neue Bakterien.','Nährbrühe verdirbt immer nach einigen Tagen, egal was man tut.'],
+ e:'Kolben 1 hatte Kontakt zur Luft und blieb trotzdem klar. Also verdirbt die Brühe nicht durch die Luft selbst, sondern durch Keime, die von außen hineinfallen. Nur in Kolben 2 konnten sie hinein.'},
+{id:'p11',c:'pio',a:3,type:'free',p:4,q:'„<b>Ohne Zufall kein Penicillin!</b>“ – <b>Nimm Stellung</b> zu dieser Aussage. Beziehe dabei auch die Arbeit von Florey und Chain ein.',
+ pts:[{t:'Pro: Ein Zufall war wichtig: Die Schale blieb im Urlaub stehen, ein Schimmelpilz geriet zufällig hinein.',kw:['zufall','urlaub','zufällig','vergessen','unordentlich','fenster']},{t:'Contra: Fleming musste genau beobachten und mit seinem Fachwissen die Bedeutung erkennen (andere hätten die Schale weggeworfen).',kw:['beobacht','erkannt','genau','wissen','weggeworfen','hingeschaut']},{t:'Florey & Chain reinigten Penicillin, testeten es und machten es nutzbar. Massenproduktion war nötig.',kw:['florey','chain','gereinigt','reinig','massen','herstell','test']},{t:'Begründetes Fazit / eigene Meinung (z. B. Zufall als Auslöser, aber Wissenschaft als Teamarbeit).',kw:['fazit','meiner meinung','ich finde','insgesamt','deshalb','ich denke']}],
+ m:'Einerseits stimmt die Aussage: Ohne den Zufall, dass Fleming seine Schalen im Urlaub stehen ließ und ein Schimmelpilz hineingeriet, hätte er die Wirkung nicht entdeckt. Andererseits reicht Zufall allein nicht. Fleming musste genau hinschauen und mit seinem Wissen erkennen, dass der Pilz einen bakterientötenden Stoff abgibt. Viele hätten die Schale einfach weggeworfen. Außerdem konnte Fleming Penicillin nicht rein herstellen. Erst Florey und Chain reinigten es und testeten es an Mäusen und Menschen, danach kam die Massenproduktion. Fazit: Der Zufall war der Auslöser, aber erst genaue Beobachtung und Teamarbeit machten aus ihm ein Medikament.'},
+{id:'p12',c:'pio',a:3,type:'free',p:3,q:'<b>Beurteile</b>, welcher der drei Forscher (Koch, Pasteur, Fleming) deiner Meinung nach für deinen Alltag heute am wichtigsten ist. Vergleiche mit mindestens einem anderen Forscher.',
+ pts:[{t:'Ein Forscher wird gewählt und seine Leistung richtig genannt.',kw:['koch','pasteur','fleming']},{t:'Bezug zum heutigen Alltag (z. B. Antibiotika beim Arzt, pasteurisierte Milch, Impfungen, Diagnose von Krankheiten).',kw:['heute','alltag','milch','antibiotik','impf','arzt','supermarkt']},{t:'Vergleich mit mindestens einem anderen Forscher und begründetes Urteil.',kw:['dagegen','im vergleich','aber','wichtiger','als','während']}],
+ m:'Beispiel: Ich halte Pasteur für am wichtigsten, weil ich jeden Tag pasteurisierte Milch trinke und viele Impfungen auf seinen Ideen beruhen. Koch hat zwar gezeigt, welche Bakterien krank machen, und Fleming hat das Penicillin entdeckt. Antibiotika brauche ich aber nur selten, Lebensmittelsicherheit und Hygiene betreffen mich täglich. (Andere Urteile sind möglich, wenn sie gut begründet sind.)'},
+{id:'p13',c:'pio',a:1,type:'mc',p:1,q:'Wofür erhielt Robert Koch <b>1905</b> den Nobelpreis?',
+ o:['für die Entdeckung des Penicillins','für die Tollwut-Impfung','+für seine Forschung zur Tuberkulose und die Entdeckung ihres Erregers','für die Erfindung der Petrischale'],e:'1882 entdeckte Koch den Tuberkulose-Erreger, 1905 bekam er dafür den Nobelpreis.'},
+{id:'p14',c:'pio',a:2,type:'cloze',p:3,q:'<b>Ergänze</b> den Merksatz. Tippe die fehlenden Wörter selbst ein.',
+ t:'{Koch} zeigte, welche Bakterien krank machen. {Pasteur} zeigte, wie man sich vor ihnen schützt. {Fleming} fand mit dem {Penicillin|penizillin} ein Mittel, um Infektionen durch {Bakterien|bakterien} zu heilen.'},
+
+/* ---------------------- ANTIBIOTIKA ---------------------- */
+{id:'a1',c:'ab',a:1,type:'mc',p:1,q:'Was versteht man unter <b>Antibiotika</b>?',
+ o:['Wirkstoffe, die Viren in unseren Zellen zerstören.','Impfstoffe, die vor Bakterien schützen.','Schmerzmittel, die das Fieber senken.','+Wirkstoffe, die Bakterien abtöten oder ihre Vermehrung hemmen.'],
+ e:'anti = gegen, bios = Leben. Antibiotika wirken gegen Bakterien, nicht gegen Viren.'},
+{id:'a2',c:'ab',a:1,type:'tf',p:3,q:'<b>Entscheide:</b> richtig oder falsch?',
+ s:[['Bei einer Grippe helfen Antibiotika schnell.',false,'Grippe wird von Viren ausgelöst, Antibiotika wirken dagegen nicht.'],['Das erste Antibiotikum stammt von einem Schimmelpilz.',true,''],['Antibiotika töten nur krankmachende Bakterien, nützliche bleiben verschont.',false,'Auch nützliche Darmbakterien sterben, deshalb oft Durchfall.'],['Wenn es mir besser geht, kann ich das Antibiotikum absetzen.',false,'Man muss es so lange nehmen wie verordnet, sonst überleben widerstandsfähige Bakterien.'],['Antibiotika können heute auch künstlich hergestellt werden.',true,''],['Unsere Körperzellen werden von Antibiotika kaum geschädigt, weil sie keine Zellwand haben.',true,'']]},
+{id:'a3',c:'ab',a:2,type:'label',p:3,fig:'attack',q:'Antibiotika greifen die Bakterienzelle an drei Stellen an. <b>Ordne</b> jedem Pfeil die passende Wirkung zu. Vorsicht, es gibt Fallen!',
+ l:['Aufbau der Zellwand wird gestoppt → die Zelle platzt','Ribosomen werden blockiert → keine Eiweiße','Kopieren der Erbsubstanz wird gestört → keine Teilung'],x:['Zellkern wird aufgelöst','Chloroplasten werden zerstört'],
+ e:'Bakterien haben weder Zellkern noch Chloroplasten. Diese Antworten sind also unmöglich.'},
+{id:'a4',c:'ab',a:2,type:'free',p:3,q:'Tom hat eine Erkältung und möchte von der Ärztin ein Antibiotikum. Sie lehnt ab.<br><b>Erkläre</b>, warum Antibiotika gegen Bakterien wirken, gegen Viren aber nicht.',
+ pts:[{t:'Antibiotika greifen Bestandteile an, die nur Bakterien haben: Zellwand, Ribosomen, eigener Stoffwechsel/Teilung.',kw:['zellwand','ribosom','stoffwechsel','teilung','erbgut','erbsubstanz']},{t:'Viren sind keine Zellen und haben diese Bestandteile nicht.',kw:['keine zelle','keine zellwand','keine ribosom','kein stoffwechsel','nicht lebendig','keinen eigenen']},{t:'Viren vermehren sich in unseren Körperzellen → Antibiotika haben keinen Angriffspunkt. Eine Erkältung wird meist von Viren ausgelöst.',kw:['körperzell','wirtszell','angriffspunkt','in unseren zellen','erkältung','virus','viren']}],
+ m:'Antibiotika greifen gezielt Teile an, die nur Bakterien besitzen, z. B. die Zellwand, die Ribosomen oder das Kopieren ihrer Erbsubstanz. Viren sind keine Zellen: Sie haben keine Zellwand, keine Ribosomen und keinen eigenen Stoffwechsel. Sie vermehren sich in unseren Körperzellen. Antibiotika finden bei ihnen deshalb keinen Angriffspunkt. Eine Erkältung wird meist von Viren ausgelöst, darum hilft ein Antibiotikum nicht.'},
+{id:'a5',c:'ab',a:2,type:'mc',p:2,q:'Paul nimmt ein Antibiotikum gegen eine Lungenentzündung. Nach zwei Tagen bekommt er <b>Durchfall</b>. Welche Erklärung ist fachlich richtig?',
+ o:['Die Erreger der Lungenentzündung sind in den Darm gewandert.','Durchfall zeigt, dass das Antibiotikum nicht wirkt.','+Das Antibiotikum tötet auch nützliche Darmbakterien, die bei der Verdauung helfen.','Die Bakterien sind resistent geworden und verursachen jetzt Durchfall.'],
+ e:'Antibiotika unterscheiden nicht zwischen „guten“ und „schlechten“ Bakterien. Fehlen die Darmbakterien, ist die Verdauung gestört.'},
+{id:'a6',c:'ab',a:2,type:'label',p:4,fig:'resist',q:'Die Bildfolge zeigt, wie eine Antibiotika-Resistenz entsteht. <b>Ordne</b> jedem Bild (A–D) die richtige Beschreibung zu.',mk:['A','B','C','D'],
+ l:['Infektion: viele empfindliche und wenige zufällig resistente Bakterien','Das Antibiotikum wirkt: empfindliche Bakterien sterben ab','Die Behandlung wird zu früh abgebrochen: vor allem resistente Bakterien überleben','Die Überlebenden vermehren sich: jetzt sind fast alle Bakterien resistent'],
+ x:['Das Antibiotikum verwandelt empfindliche Bakterien in resistente'],
+ e:'Das Antibiotikum <b>macht</b> keine Bakterien resistent. Die Resistenz war durch zufällige Mutationen schon da. Das Antibiotikum sorgt nur dafür, dass die resistenten übrig bleiben (Selektion).'},
+{id:'a7',c:'ab',a:2,type:'cloze',p:4,q:'<b>Vervollständige</b> den Text zur Entstehung von Resistenzen.',
+ t:'Beim Kopieren der Erbsubstanz entstehen zufällig kleine Fehler, sogenannte [Mutationen|Infektionen|Toxine]. Manchmal kann ein Bakterium dadurch ein Antibiotikum überstehen. Es ist [resistent|empfindlich|immun]. Nimmt man ein Antibiotikum, sterben die [empfindlichen|resistenten|nützlichen] Bakterien. Die resistenten überleben und [vermehren sich|sterben später|werden zu Viren]. Diesen Vorgang nennt man [Selektion|Mutation|Pasteurisierung]. Bakterien, die gegen viele Antibiotika resistent sind, heißen [multiresistente Keime|Antikörper|Plasmide], z. B. [MRSA|HIV|Penicillium].'},
+{id:'a8',c:'ab',a:1,type:'multi',p:4,q:'Welche Regeln für den Umgang mit Antibiotika sind <b>richtig</b>? Wähle alle passenden aus.',
+ o:['Reste für Geschwister aufheben, falls sie mal krank werden.','+Nur einnehmen, wenn eine Ärztin oder ein Arzt es verschrieben hat.','Bei einer Erkältung vorsorglich einnehmen.','+So lange einnehmen wie verordnet, auch wenn es einem schon besser geht.','+Reste in der Apotheke abgeben oder über den Restmüll entsorgen.','Hat man eine Tablette vergessen, nimmt man beim nächsten Mal einfach die doppelte Menge.','+Die vorgeschriebenen Zeitabstände möglichst genau einhalten.'],
+ e:'Die doppelte Menge ist gefährlich. Bei einer vergessenen Tablette fragt man in der Apotheke oder schaut in den Beipackzettel.'},
+{id:'a9',c:'ab',a:3,type:'free',p:4,q:'<b>Fallbeispiel:</b> Lena (14) hat eine eitrige Mandelentzündung. Die Ärztin verschreibt ihr ein Antibiotikum für 7 Tage. Nach 3 Tagen fühlt sich Lena gesund. Sie hört auf und hebt den Rest für ihren Bruder auf, „falls der mal krank wird“.<br><b>Beurteile</b> Lenas Verhalten aus biologischer Sicht und formuliere <b>zwei Ratschläge</b>.',
+ pts:[{t:'Nach 3 Tagen sind nur die empfindlichen Bakterien größtenteils tot, widerstandsfähigere überleben.',kw:['überleb','empfindlich','widerstandsfähig','nicht alle','noch bakterien']},{t:'Die Überlebenden vermehren sich → Rückfall und Resistenzbildung (Selektion).',kw:['vermehr','resisten','rückfall','wieder krank','selektion']},{t:'Weitergabe ist gefährlich: Bruder hat evtl. eine Virusinfektion, andere Krankheit, Allergie oder braucht eine andere Dosis.',kw:['virus','viren','allergi','dosis','andere krankheit','nicht verschrieben','arzt']},{t:'Zwei Ratschläge: bis zum Ende wie verordnet einnehmen UND Reste nicht aufheben/weitergeben, sondern entsorgen.',kw:['bis zum ende','7 tage','sieben tage','zu ende','entsorg','apotheke','restmüll']}],
+ m:'Lenas Verhalten ist falsch. Nach drei Tagen sind zwar viele empfindliche Bakterien tot, widerstandsfähigere können aber überleben. Wenn Lena aufhört, vermehren sie sich wieder: Sie kann einen Rückfall bekommen, und es können sich resistente Bakterien durchsetzen (Selektion). Auch die Weitergabe an den Bruder ist gefährlich: Vielleicht hat er eine Virusinfektion, gegen die das Mittel nicht hilft, eine Allergie oder er braucht eine andere Dosis. Ratschläge: 1. Nimm das Antibiotikum alle 7 Tage lang genau nach Anweisung. 2. Hebe keine Reste auf, sondern gib sie in der Apotheke ab.'},
+{id:'a10',c:'ab',a:3,type:'multi',p:4,fig:'antibiogram',q:'Im Labor wurden Bakterien eines Patienten auf einem Nährboden verteilt. Darauf liegen vier Plättchen mit den Antibiotika A–D. Nach 24 Stunden sieht die Schale so aus. <b>Werte aus:</b> Welche Aussagen sind richtig?',
+ o:['+Antibiotikum A wirkt am besten gegen diese Bakterien.','+Die Bakterien sind gegen Antibiotikum B resistent.','Antibiotikum C wirkt gar nicht.','+Die einzelnen Kolonien im Hemmhof von D zeigen, dass einige Bakterien gegen D widerstandsfähig sind.','B sollte man verschreiben, weil die Bakterien dort am dichtesten wachsen.','Je kleiner der Hemmhof, desto besser wirkt das Antibiotikum.'],
+ e:'Je größer der Hemmhof (bakterienfreier Ring), desto besser wirkt das Antibiotikum: A > D > C > B. Bei B gibt es keinen Hemmhof → resistent. Die Kolonien im Hof von D sind resistente Bakterien. Würde man D verschreiben, könnten genau diese überleben. Dieses Verfahren heißt <b>Antibiogramm</b>.'},
+{id:'a11',c:'ab',a:3,type:'free',p:4,fig:'stopCurve',q:'Die Grafik zeigt die Anzahl der Krankheitserreger im Körper einer Patientin. Das Antibiotikum sollte 7 Tage genommen werden. Im Labor stellt man fest, dass die Bakterien am Tag 10 kaum noch auf das Antibiotikum reagieren.<br><b>Beschreibe</b> den Verlauf und <b>erkläre</b> ihn.',
+ pts:[{t:'Beschreibung: Von Tag 0 bis 3 sinkt die Anzahl stark.',kw:['sinkt','nimmt ab','abnahme','weniger','fällt']},{t:'Erklärung: Das Antibiotikum tötet die empfindlichen Bakterien.',kw:['empfindlich','tötet','abgetötet','sterben','wirkt']},{t:'Ab Tag 3 (Abbruch) steigt die Anzahl wieder an, weil überlebende (widerstandsfähige) Bakterien sich vermehren.',kw:['abbruch','abgebrochen','steigt','nimmt zu','vermehr','überleb']},{t:'Folge: Jetzt sind überwiegend resistente Bakterien vorhanden (Selektion) → das Antibiotikum wirkt nicht mehr, Rückfall.',kw:['resisten','selektion','wirkt nicht','rückfall']}],
+ m:'Während der Einnahme (Tag 0–3) sinkt die Zahl der Bakterien stark, weil das Antibiotikum die empfindlichen Bakterien abtötet. Am Tag 3 wird die Einnahme abgebrochen, obwohl sie bis Tag 7 dauern sollte. Danach steigt die Zahl wieder an: Die überlebenden Bakterien waren die widerstandsfähigsten und vermehren sich jetzt ohne Konkurrenz. Weil vor allem resistente Bakterien übrig geblieben sind (Selektion), wirkt das Antibiotikum am Tag 10 kaum noch. Die Patientin hat einen Rückfall.'},
+{id:'a12',c:'ab',a:3,type:'mc',p:3,q:'Welche Aussage zur Entstehung von Resistenzen ist <b>fachlich richtig</b>?',
+ o:['Der Körper gewöhnt sich an das Antibiotikum, deshalb wirkt es nicht mehr.','Die Bakterien merken das Antibiotikum und verändern ihr Erbgut gezielt, um zu überleben.','+Resistente Bakterien gibt es durch zufällige Mutationen schon vorher. Das Antibiotikum sorgt dafür, dass sie übrig bleiben.','Das Antibiotikum macht die Bakterien stärker, je länger man es nimmt.'],
+ e:'Typischer Denkfehler: Nicht der <b>Mensch</b> wird resistent, sondern die <b>Bakterien</b>. Und Mutationen passieren <b>zufällig</b>, nicht gezielt. Das Antibiotikum wählt nur aus (Selektion).'},
+{id:'a13',c:'ab',a:3,type:'mc',p:3,q:'In manchen Ländern bekommen Masttiere regelmäßig Antibiotika, auch wenn sie gesund sind. Warum ist das auch für Menschen gefährlich?',
+ o:['Die Tiere bilden Antikörper gegen das Antibiotikum, die wir mit dem Fleisch essen.','+Resistente Bakterien sind dort ständig im Vorteil, vermehren sich und können über Fleisch oder Kontakt auf Menschen übertragen werden.','Antibiotika verwandeln harmlose Bakterien der Tiere in Viren.','Das Fleisch enthält dann so viel Antibiotikum, dass Menschen nie mehr krank werden.'],
+ e:'Je öfter Antibiotika eingesetzt werden, desto häufiger überleben nur die resistenten Bakterien (Selektion). Diese Keime können auch Menschen infizieren.'},
+{id:'a14',c:'ab',a:2,type:'free',p:3,q:'Antibiotika-Resistenzen gelten als großes Problem. <b>Erkläre</b>, was man unter einer Resistenz versteht, und <b>nenne</b> mögliche Folgen für den Menschen.',
+ pts:[{t:'Resistenz: Bakterien sind widerstandsfähig gegen ein Antibiotikum, es wirkt nicht mehr.',kw:['widerstandsfähig','wirkt nicht','unempfindlich','überleben']},{t:'Folge: Infektionen sind schwer oder gar nicht mehr zu behandeln, Krankheiten dauern länger, können tödlich enden.',kw:['nicht mehr behandel','schwer','tödlich','sterben','länger krank','gefährlich']},{t:'Weitere Folge: Man braucht andere/neue Antibiotika. Besonders in Krankenhäusern gefürchtet (multiresistente Keime, MRSA).',kw:['neue antibiotik','anderes antibiotik','krankenhaus','multiresistent','mrsa']}],
+ m:'Eine Resistenz bedeutet, dass Bakterien gegen ein Antibiotikum widerstandsfähig geworden sind. Das Medikament tötet sie nicht mehr ab. Infektionen mit solchen Bakterien sind schwer oder gar nicht behandelbar. Kranke bleiben länger krank, im schlimmsten Fall sterben sie. Ärztinnen und Ärzte brauchen dann andere oder neue Antibiotika. Besonders gefürchtet sind multiresistente Keime wie MRSA in Krankenhäusern.'},
+{id:'a15',c:'ab',a:1,type:'mc',p:1,q:'Die Ärztin sagt: „Nimm das Antibiotikum <b>alle 8 Stunden</b>.“ Die erste Tablette nimmst du um <b>7 Uhr</b>. Wann nimmst du die nächsten beiden?',
+ o:['um 12 Uhr und um 18 Uhr','+um 15 Uhr und um 23 Uhr','um 8 Uhr und um 9 Uhr','um 13 Uhr und um 19 Uhr'],e:'7 + 8 = 15 Uhr, 15 + 8 = 23 Uhr. Gleiche Zeitabstände halten die Menge an Wirkstoff im Blut gleichmäßig hoch.'},
+{id:'a16',c:'ab',a:2,type:'free',p:3,q:'Fleming warnte schon 1945 in seiner Nobelpreisrede: „Wer zu wenig Penicillin einnimmt, macht die Bakterien widerstandsfähig.“<br><b>Erläutere</b> diese Warnung mithilfe der Begriffe <b>Mutation</b>, <b>Selektion</b> und <b>Vermehrung</b>.',
+ pts:[{t:'Mutation: Durch zufällige Fehler im Erbgut sind einige Bakterien widerstandsfähiger.',kw:['mutation']},{t:'Selektion: Bei zu wenig Penicillin sterben nur die empfindlichen, die widerstandsfähigen überleben.',kw:['selektion','auslese','überleb']},{t:'Vermehrung: Die Überlebenden vermehren sich ohne Konkurrenz → die Population wird resistent.',kw:['vermehr','teilen','konkurrenz']}],
+ m:'Unter vielen Bakterien sind durch zufällige <b>Mutationen</b> einige etwas widerstandsfähiger. Nimmt man zu wenig Penicillin (zu kleine Menge oder zu kurz), sterben nur die empfindlichen Bakterien. Die widerstandsfähigen überleben: Das ist die <b>Selektion</b>. Sie haben keine Konkurrenz mehr und <b>vermehren</b> sich. So besteht die Bakterienpopulation am Ende fast nur aus resistenten Bakterien.'},
+
+/* ---------------------- SALMONELLOSE ---------------------- */
+{id:'s1',c:'sal',a:1,type:'mc',p:1,q:'Welcher Erreger löst die <b>Salmonellose</b> aus?',
+ o:['Viren, die über Tröpfchen übertragen werden','Streptokokken (Kugelbakterien)','+Salmonellen, stäbchenförmige Bakterien','Schimmelpilze auf altem Brot'],e:'Salmonellen sind begeißelte Stäbchenbakterien. Sie leben im Darm von Tieren, vor allem von Geflügel.'},
+{id:'s2',c:'sal',a:1,type:'multi',p:3,q:'Welche Symptome sind <b>typisch</b> für eine Salmonellose? Wähle alle passenden aus.',
+ o:['+plötzlicher Durchfall','„Himbeerzunge“','+Bauchschmerzen','+Übelkeit und Erbrechen','anhaltender Husten mit Auswurf','+Fieber','Kiefersperre und Muskelkrämpfe'],
+ e:'Himbeerzunge = Scharlach, Husten mit Auswurf = Tuberkulose, Kiefersperre = Tetanus.'},
+{id:'s3',c:'sal',a:1,type:'cat',p:4,q:'<b>Ordne</b> die Lebensmittel nach ihrem Salmonellen-Risiko.',
+ b:['hohes Risiko','geringes Risiko'],items:[['Tiramisu mit rohen Eiern',0],['Mettbrötchen',0],['Hähnchen, innen noch rosa',0],['Rohmilch direkt vom Bauernhof',0],['frisch gekochte Nudeln',1],['ein 10 Minuten gekochtes Ei',1],['pasteurisierte Milch',1],['selbst gemachte Mayonnaise, die stundenlang in der Sonne stand',0]],
+ e:'Gefährlich sind rohe oder nicht durchgegarte tierische Lebensmittel, vor allem wenn sie warm stehen. Durch Erhitzen (Kochen, Pasteurisieren) werden Salmonellen abgetötet.'},
+{id:'s4',c:'sal',a:2,type:'match',p:3,q:'<b>Ordne</b> jeder Hygieneregel die passende Begründung zu.',
+ pairs:[['Auftauwasser von gefrorenem Geflügel sofort wegschütten','Es kann sehr viele Salmonellen enthalten.'],['Fleisch durchgaren (innen mind. 70 °C)','Hitze tötet die Salmonellen ab.'],['Eierspeisen im Kühlschrank lagern','Kälte bremst die Vermehrung der Bakterien.'],['Nach rohem Fleisch die Hände waschen','So gelangen keine Erreger per Schmierinfektion auf andere Speisen.'],['Für Fleisch und Salat verschiedene Bretter nutzen','Salat wird nicht mehr erhitzt, Keime würden überleben.'],['Speisen nicht lange lauwarm stehen lassen','Bei 30–40 °C vermehren sich Salmonellen besonders schnell.']]},
+{id:'s5',c:'sal',a:2,type:'tf',p:3,q:'<b>Entscheide:</b> richtig oder falsch?',
+ s:[['Einfrieren tötet Salmonellen sicher ab.',false,'Salmonellen überleben das Einfrieren und vermehren sich nach dem Auftauen weiter.'],['Lebensmittel mit Salmonellen riechen immer verdorben.',false,'Man sieht, riecht und schmeckt Salmonellen nicht.'],['Die wichtigste Behandlung ist, viel zu trinken.',true,'Durch Durchfall und Erbrechen verliert der Körper viel Flüssigkeit und Salze.'],['Salmonellose wird hauptsächlich über Tröpfchen beim Husten übertragen.',false,'Meist über verunreinigte Lebensmittel und Schmierinfektion.'],['In lauwarmen Speisen können sich Salmonellen sehr schnell vermehren.',true,''],['Jede Salmonellose muss sofort mit Antibiotika behandelt werden.',false,'Antibiotika nur bei schweren Verläufen, meist heilt die Krankheit nach einigen Tagen von selbst.']]},
+{id:'s6',c:'sal',a:3,type:'num',p:3,q:'Auf einem Kartoffelsalat befinden sich <b>200 Salmonellen</b>. Der Salat steht beim Grillfest <b>3 Stunden</b> in der Sonne. Bei dieser Wärme teilen sich die Salmonellen alle <b>20 Minuten</b>. Wie viele Salmonellen sind es danach?',ans:102400,unit:'Salmonellen',
+ e:'3 Stunden = 180 Minuten = 9 Teilungen. 2<sup>9</sup> = 512. 200 · 512 = <b>102 400</b>. Schon 3 Stunden machen aus einer kleinen Menge eine gefährliche!'},
+{id:'s7',c:'sal',a:2,type:'free',p:4,q:'Am Samstag feiert Familie Berger ein Sommerfest. Es gibt Hähnchenspieße vom Grill und Tiramisu, das seit dem Mittag auf der Terrasse steht. In der Nacht zum Sonntag bekommen mehrere Gäste Durchfall, Bauchkrämpfe und Fieber.<br><b>Nenne</b> die vermutliche Krankheit und <b>begründe</b> deine Vermutung mit mindestens drei Hinweisen aus dem Text.',
+ pts:[{t:'Krankheit: Salmonellose (Lebensmittelinfektion durch Salmonellen).',kw:['salmonell']},{t:'Symptome passen: Durchfall, Bauchkrämpfe, Fieber.',kw:['durchfall','bauch','fieber','symptom']},{t:'Riskante Lebensmittel: Tiramisu mit rohen Eiern / Hähnchen evtl. nicht durchgegart.',kw:['tiramisu','roh','ei','hähnchen','geflügel','durchgegart']},{t:'Wärme: Tiramisu stand stundenlang warm → Salmonellen konnten sich vermehren. Zeitraum (einige Stunden) passt zur Inkubationszeit.',kw:['warm','sonne','terrasse','stunden','vermehr','inkubation','nacht']}],
+ m:'Vermutlich haben die Gäste eine Salmonellose. Die Symptome Durchfall, Bauchkrämpfe und Fieber passen dazu. Tiramisu enthält rohe Eier, und auch Hähnchen kann Salmonellen enthalten, wenn es nicht durchgegart ist. Das Tiramisu stand stundenlang in der Wärme, dort konnten sich die Salmonellen stark vermehren. Die Beschwerden begannen wenige Stunden nach dem Essen. Das passt zur Inkubationszeit von 6 bis 72 Stunden.'},
+{id:'s8',c:'sal',a:3,type:'mc',p:4,q:'<b>Detektiv-Aufgabe:</b> Nach einer Feier erkranken vier von sechs Gästen an Salmonellose. Die Tabelle zeigt, wer was gegessen hat. Welche Speise ist am wahrscheinlichsten die Ursache?<div class="info" style="margin-top:10px;overflow-x:auto"><table class="tbl"><tr><th>Gast</th><th>krank?</th><th>Hähnchen (durchgebraten)</th><th>Kartoffelsalat mit selbst gemachter Mayonnaise</th><th>Brot</th><th>Obstsalat</th></tr><tr><td>Ali</td><td>ja</td><td>✔</td><td>✔</td><td>✔</td><td>–</td></tr><tr><td>Bea</td><td>ja</td><td>–</td><td>✔</td><td>✔</td><td>✔</td></tr><tr><td>Can</td><td>nein</td><td>✔</td><td>–</td><td>✔</td><td>✔</td></tr><tr><td>Dana</td><td>ja</td><td>✔</td><td>✔</td><td>✔</td><td>–</td></tr><tr><td>Emil</td><td>nein</td><td>✔</td><td>–</td><td>✔</td><td>✔</td></tr><tr><td>Fiona</td><td>ja</td><td>✔</td><td>✔</td><td>–</td><td>–</td></tr></table></div>',
+ o:['das Hähnchen, weil die meisten Gäste es gegessen haben','+der Kartoffelsalat, weil genau alle Kranken und keiner der Gesunden ihn gegessen haben','das Brot, weil fast alle Gäste es gegessen haben','der Obstsalat, weil Bea ihn gegessen hat'],
+ e:'Can und Emil haben Hähnchen gegessen und sind gesund geblieben. Bea hatte kein Hähnchen und ist trotzdem krank. Nur der Kartoffelsalat passt genau. Selbst gemachte Mayonnaise enthält rohe Eier.'},
+{id:'s9',c:'sal',a:2,type:'mc',p:2,q:'Wie wird eine Salmonellose bei einem sonst gesunden Jugendlichen meistens behandelt?',
+ o:['Er muss sofort ein Antibiotikum nehmen.','Er bekommt eine Impfung gegen Salmonellen.','+Viel trinken, um Flüssigkeit und Salze zu ersetzen, und Schonkost.','Ein fiebersenkendes Mittel reicht, Trinken ist nicht wichtig.'],
+ e:'Meist heilt eine Salmonellose nach einigen Tagen von selbst. Gefährlich ist vor allem der Flüssigkeitsverlust.'},
+{id:'s10',c:'sal',a:3,type:'free',p:3,q:'Jonas sagt: „Salmonellen sind Bakterien. Also muss man bei einer Salmonellose immer sofort ein Antibiotikum nehmen!“<br><b>Beurteile</b> Jonas’ Aussage.',
+ pts:[{t:'Richtig ist: Salmonellen sind Bakterien, Antibiotika könnten grundsätzlich wirken.',kw:['bakterien','grundsätzlich','wirken','stimmt']},{t:'Aber: Bei den meisten Gesunden heilt die Krankheit nach wenigen Tagen von selbst. Wichtig ist, viel zu trinken.',kw:['von selbst','wenige tage','trinken','flüssigkeit','nicht nötig','nicht immer']},{t:'Antibiotika haben Nachteile: Sie töten nützliche Darmbakterien und fördern Resistenzen → nur bei schweren Verläufen/Risikogruppen (Säuglinge, alte Menschen) nach ärztlicher Entscheidung.',kw:['resisten','darmbakterien','schwer','säugling','alte','risiko','arzt','ärzt']}],
+ m:'Jonas hat teilweise recht: Salmonellen sind Bakterien, ein Antibiotikum könnte also wirken. Trotzdem ist es meist nicht nötig. Bei gesunden Menschen heilt die Salmonellose nach einigen Tagen von selbst. Am wichtigsten ist, viel zu trinken. Antibiotika töten außerdem nützliche Darmbakterien und fördern Resistenzen. Deshalb verschreibt die Ärztin sie nur bei schweren Verläufen oder bei Risikogruppen wie Säuglingen und alten Menschen. Jonas’ Aussage ist also falsch.'},
+{id:'s11',c:'sal',a:2,type:'order',p:3,q:'<b>Bringe</b> den Infektionsweg in die richtige Reihenfolge.',
+ items:['Ein Huhn trägt Salmonellen in seinem Darm.','Die Eier werden außen mit Salmonellen verunreinigt.','Aus rohen Eiern wird eine Nachspeise zubereitet.','Die Nachspeise steht mehrere Stunden warm. Die Salmonellen vermehren sich stark.','Ein Mensch isst die Nachspeise.','Nach etwa einem Tag bekommt er Durchfall, Bauchschmerzen und Fieber.']},
+{id:'s12',c:'sal',a:2,type:'cloze',p:3,q:'<b>Vervollständige</b> den Steckbrief zur Salmonellose.',
+ t:'<b>Erreger:</b> [Salmonellen (Stäbchenbakterien)|Grippeviren|Streptokokken]<br><b>Ansteckung:</b> v. a. über [verunreinigte Lebensmittel|Zeckenstiche|Tröpfchen beim Niesen] und Schmierinfektion<br><b>Inkubationszeit:</b> [6 bis 72 Stunden|2 bis 12 Wochen|10 bis 14 Tage]<br><b>Symptome:</b> [Durchfall, Bauchschmerzen, Erbrechen, Fieber|Hautausschlag und Himbeerzunge|Husten mit Auswurf und Nachtschweiß]<br><b>Behandlung:</b> [viel trinken, Flüssigkeit und Salze ersetzen|Impfung nach der Ansteckung|Antibiotika über 6 Monate]'},
+{id:'s13',c:'sal',a:1,type:'mc',p:1,q:'Wie kann man Salmonellen in Fleisch <b>sicher abtöten</b>?',
+ o:['im Gefrierfach bei −18 °C einfrieren','das Fleisch gut mit kaltem Wasser abwaschen','+das Fleisch durchgaren, sodass es auch innen mindestens 70 °C für mehrere Minuten erreicht','das Fleisch kurz auf 40 °C anwärmen'],
+ e:'Erst gründliches Erhitzen tötet Salmonellen ab. 30–40 °C ist sogar ihre Wohlfühltemperatur!'},
+{id:'s14',c:'sal',a:3,type:'mc',p:3,q:'Mia schneidet rohes Hähnchen auf einem Brett. Danach schneidet sie auf demselben Brett, ohne es zu spülen, Gurken für den Salat. Das Hähnchen brät sie gut durch. Trotzdem wird die Familie krank. Wie lautet die beste Erklärung?',
+ o:['Das Hähnchen war trotz Durchbraten noch gefährlich.','Gurken enthalten von Natur aus Salmonellen.','+Salmonellen gelangten vom Brett auf die Gurken (Schmierinfektion). Der Salat wird nicht erhitzt, die Keime überleben.','Durch das Braten haben sich die Salmonellen im Brett vermehrt.'],
+ e:'Das ist eine Schmierinfektion über Küchengeräte. Deshalb: getrennte Bretter verwenden oder sie nach rohem Fleisch heiß spülen.'},
+
+/* ---------------------- STECKBRIEF ---------------------- */
+{id:'t1',c:'stb',a:1,type:'order',p:2,q:'<b>Bringe</b> die vier Schritte zum Erstellen eines Steckbriefs in die richtige Reihenfolge.',
+ items:['Den Text zweimal genau lesen und unbekannte Wörter klären.','Eine Legende anlegen: jede Kategorie bekommt eine eigene Farbe.','Nur die Schlüsselwörter in der passenden Farbe markieren.','Die Informationen in Stichpunkten in den Steckbrief übertragen.']},
+{id:'t2',c:'stb',a:1,type:'mc',p:1,q:'Was zeichnet einen guten Steckbrief aus?',
+ o:['Er enthält möglichst viele Informationen aus dem Text, auch Geschichten und Beispiele.','Er besteht aus ganzen Sätzen, die man aus dem Text abschreibt.','+Er enthält nur die wichtigsten Informationen: kurz, in Stichpunkten und übersichtlich.','Er enthält vor allem die eigene Meinung zur Krankheit.'],
+ e:'Merke: Weniger ist mehr! Stichpunkte, Fachbegriffe, klare Gliederung.'},
+{id:'t3',c:'stb',a:2,type:'mark',p:4,q:'<b>Markiere</b> die Schlüsselwörter im Text zur <b>Cholera</b> in der passenden Farbe. Wähle zuerst oben eine Farbe, dann tippe auf die Textstelle. Achtung: Nicht alles, was man antippen kann, gehört in den Steckbrief! Ein falscher Tipp gibt Abzug.',
+ t:'Cholera ist eine gefährliche Durchfallerkrankung. Ausgelöst wird sie durch [[das kommaförmige Bakterium Vibrio cholerae|1]]. [[Robert Koch entdeckte den Erreger 1884 in Indien.|x]] Angesteckt wird man vor allem über [[verunreinigtes Trinkwasser|0]] oder [[mit Keimen belastete Lebensmittel|0]], zum Beispiel ungewaschenes Obst. [[Heute kommt Cholera vor allem in Regionen ohne sauberes Trinkwasser vor.|x]] Nach der Ansteckung dauert es [[wenige Stunden bis fünf Tage|2]], bis die Krankheit ausbricht. Dann kommt es zu [[starkem, wässrigem Durchfall|3]] und [[Erbrechen|3]]. Der Körper verliert dadurch [[sehr schnell viel Flüssigkeit|3]], und es können [[Muskelkrämpfe|3]] auftreten. [[1892 starben in Hamburg über 8000 Menschen an Cholera.|x]] Die wichtigste Behandlung ist, [[Flüssigkeit und Salze zu ersetzen|4]], mit einer Trinklösung oder einer Infusion. In schweren Fällen bekommen Erkrankte zusätzlich [[Antibiotika|4]].',
+ e:'Jahreszahlen, Geschichte und Verbreitung sind interessant, gehören aber nicht in die fünf Steckbrief-Kategorien.'},
+{id:'t4',c:'stb',a:3,type:'mark',p:5,q:'<b>Markiere</b> die Schlüsselwörter im Text zu <b>Tetanus</b>. Achtung: Dieser Text enthält besonders gemeine Fallen!',
+ t:'Tetanus wird auch Wundstarrkrampf genannt. Der Erreger ist [[das stäbchenförmige Bakterium Clostridium tetani|1]]. [[Es lebt im Erdboden und kann dort jahrelang überleben.|x]] Die Bakterien gelangen [[über verschmutzte Wunden|0]] in den Körper, zum Beispiel durch [[einen Holzsplitter oder einen Kratzer bei der Gartenarbeit|0]]. [[Von Mensch zu Mensch ist Tetanus nicht ansteckend.|0]] In der Wunde bilden die Bakterien einen Giftstoff. Die ersten Beschwerden treten [[meist nach 3 Tagen bis 3 Wochen|2]] auf. Typisch sind [[eine steife Kiefermuskulatur|3]] und [[schmerzhafte Muskelkrämpfe|3]], die sich über den ganzen Körper ausbreiten. Sind die Atemmuskeln betroffen, droht [[Atemnot|3]]. [[Der Name kommt vom griechischen Wort „tetanos“ für Spannung.|x]] Erkrankte müssen [[im Krankenhaus|4]] behandelt werden. Sie bekommen [[ein Gegengift|4]] und [[Antibiotika|4]], und [[die Wunde wird gründlich gereinigt|4]]. [[Bei uns erkranken nur noch wenige Menschen, weil die meisten geimpft sind.|x]]',
+ e:'Falle 1: „Nicht ansteckend von Mensch zu Mensch“ ist eine wichtige Information zur Ansteckung! Falle 2: Die Impfung schützt vor der Krankheit. Sie ist <b>Vorbeugung</b>, keine <b>Behandlung</b>.'},
+{id:'t5',c:'stb',a:2,type:'cat',p:4,q:'Infos zur <b>Borreliose</b>: <b>Ordne</b> jede Information der passenden Steckbrief-Kategorie zu oder entscheide, dass sie nicht in den Steckbrief gehört.',
+ b:['Ansteckung','Erreger','Inkubationszeit','Symptome','Behandlung','gehört nicht rein'],
+ items:[['Stich einer infizierten Zecke',0],['schraubenförmiges Bakterium Borrelia',1],['einige Tage bis wenige Wochen',2],['ringförmige Rötung um die Einstichstelle („Wanderröte“)',3],['Antibiotika über zwei bis drei Wochen',4],['Zecken gehören zu den Spinnentieren.',5],['Fieber, Kopf- und Gelenkschmerzen',3],['Benannt nach der Stadt Lyme in den USA',5]],
+ e:'Wissen über Zecken oder den Namen ist interessant, aber für den Steckbrief nicht nötig.'},
+{id:'t6',c:'stb',a:2,type:'mc',p:2,q:'Im Text steht: „<i>Angesteckt wird man meistens, wenn eine erkrankte Person in der Nähe hustet, niest oder spricht und man die winzigen Tröpfchen einatmet.</i>“ Welcher Stichpunkt passt am besten in den Steckbrief?',
+ o:['Angesteckt wird man meistens, wenn eine erkrankte Person in der Nähe hustet.','Man wird angesteckt.','+Tröpfcheninfektion (Husten, Niesen, Sprechen)','Husten und Niesen sind sehr unangenehm.'],
+ e:'Ein guter Stichpunkt enthält den Fachbegriff und die wichtigsten Schlüsselwörter, aber keinen ganzen Satz.'},
+{id:'t7',c:'stb',a:2,type:'tf',p:3,q:'<b>Entscheide:</b> richtig oder falsch?',
+ s:[['Man markiert am besten ganze Sätze, damit nichts verloren geht.',false,'Nur Schlüsselwörter markieren. Weniger ist mehr!'],['Jede Kategorie bekommt in der Legende eine eigene Farbe.',true,''],['Die Inkubationszeit ist die Zeit, die eine Krankheit insgesamt dauert.',false,'Sie ist die Zeit zwischen Ansteckung und den ersten Krankheitszeichen.'],['Eine Impfung gehört in die Kategorie „Behandlung“.',false,'Eine Impfung schützt vorher (Vorbeugung). Behandelt wird erst, wenn man krank ist.'],['Bevor man markiert, liest man den Text zweimal.',true,''],['Ein Steckbrief hat eine Überschrift mit dem Namen der Krankheit.',true,'']]},
+{id:'t8',c:'stb',a:3,type:'match',p:3,q:'Infos zum <b>Keuchhusten</b>: <b>Ordne</b> jede Textstelle der richtigen Kategorie zu.',
+ pairs:[['„… wird durch Husten und Niesen weitergegeben …“','Ansteckung'],['„… das Bakterium Bordetella pertussis …“','Erreger'],['„… meist 9 bis 10 Tage nach der Ansteckung …“','Inkubationszeit'],['„… wochenlange, krampfartige Hustenanfälle …“','Symptome'],['„… früh mit einem Antibiotikum behandeln …“','Behandlung'],['„… früher nannte man ihn den 100-Tage-Husten …“','gehört nicht in den Steckbrief']]},
+{id:'t9',c:'stb',a:3,type:'mc',p:3,q:'Welche Information aus einem Text über Scharlach gehört <b>nicht</b> in die Kategorie „Behandlung“?',
+ o:['Antibiotikum (meist Penicillin) für 7 bis 10 Tage','Bettruhe und viel trinken','+Häufiges Händewaschen und nicht aus fremden Flaschen trinken schützen am besten.','weiche, kühle Speisen gegen die Halsschmerzen'],
+ e:'Händewaschen ist <b>Vorbeugung</b>: Es verhindert eine Ansteckung. Die Behandlung beginnt erst, wenn man krank ist.'},
+{id:'t10',c:'stb',a:3,type:'sbform',p:6,q:'<b>Erstelle einen Steckbrief</b> zur Salmonellose. Lies den Text, notiere die wichtigsten Informationen <b>in Stichpunkten</b> und vergleiche danach mit der Musterlösung.',
+ info:'<b>Salmonellose – Gefahr aus der Küche</b><br>Es ist Sommer, Familie Yilmaz grillt im Garten. Zum Nachtisch gibt es Tiramisu, das seit dem Mittag in der Sonne steht. Am nächsten Morgen haben drei Gäste Bauchkrämpfe. Salmonellose ist eine der häufigsten Lebensmittelinfektionen in Deutschland. Ausgelöst wird sie durch Salmonellen, stäbchenförmige Bakterien, die sich mit Geißeln bewegen. Sie leben im Darm von Tieren, vor allem von Geflügel. Angesteckt wird man meist über verunreinigte Lebensmittel: rohe Eier und Speisen daraus (z. B. Tiramisu, Mayonnaise), nicht durchgegartes Geflügel, Hackfleisch, Mett oder Rohmilch. Auch über verschmutzte Hände oder Küchenbretter gelangen die Erreger auf andere Speisen (Schmierinfektion). Bei Wärme vermehren sich Salmonellen in Lebensmitteln sehr schnell. 6 bis 72 Stunden nach dem Essen, meist nach 12 bis 36 Stunden, beginnt die Krankheit: plötzlicher Durchfall, Bauchschmerzen, Übelkeit, Erbrechen, oft auch Fieber und Kopfschmerzen. Die meisten Gesunden sind nach wenigen Tagen wieder fit. Wichtig ist, viel zu trinken, um verlorene Flüssigkeit und Salze zu ersetzen. Antibiotika gibt die Ärztin nur bei schweren Verläufen, etwa bei Säuglingen oder alten Menschen. Übrigens: Lebensmittel mit Salmonellen sehen und riechen ganz normal.',
+ f:[{l:'Ansteckung',c:'#fbe9a6',m:'verunreinigte Lebensmittel (rohe Eier, Eierspeisen, nicht durchgegartes Geflügel, Hackfleisch/Mett, Rohmilch); Schmierinfektion (Hände, Küchenbretter)',kw:['ei','lebensmittel','geflügel','schmier','mett','hack']},
+    {l:'Erreger',c:'#cfe7fb',m:'Salmonellen (stäbchenförmige Bakterien mit Geißeln)',kw:['salmonell']},
+    {l:'Inkubationszeit',c:'#e1d3f7',m:'6 bis 72 Stunden (meist 12 bis 36 Stunden)',kw:['72','6','stunden','36']},
+    {l:'Symptome',c:'#d6ebc8',m:'plötzlicher Durchfall, Bauchschmerzen, Übelkeit, Erbrechen, Fieber, Kopfschmerzen',kw:['durchfall','bauch','erbrech','übel','fieber']},
+    {l:'Behandlung',c:'#f6cfd6',m:'viel trinken (Flüssigkeit und Salze ersetzen); Antibiotika nur bei schweren Verläufen',kw:['trink','flüssigkeit','salz']}],
+ extra:{t:'Ich habe Stichpunkte statt ganzer Sätze geschrieben und unwichtige Infos (Grillfest, Familie Yilmaz, „sieht normal aus“) weggelassen.'}}
+];
+
+/* ============================================================
+   Speicher
+   ============================================================ */
+const KEY='bakterien_lernwerkstatt_v1';
+let store={total:0,best:{},wrong:[]};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s.total==='number')store=Object.assign(store,s);}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+const LEVELS=[[0,'🌱','Keimling'],[40,'🔬','Bakterien-Entdecker*in'],[110,'🧫','Labor-Assistent*in'],[220,'🧪','Nachwuchs-Forscher*in'],[380,'🏅','Mikrobiologie-Profi'],[600,'🏆','Nobelpreis-Kandidat*in']];
+function level(p){let i=0;LEVELS.forEach((l,k)=>{if(p>=l[0])i=k;});return i;}
+function updateHeader(){
+  const i=level(store.total),L=LEVELS[i],N=LEVELS[i+1];
+  $('#ptsPill').textContent='⭐ '+fmt(store.total);$('#lvlPill').textContent=L[1]+' '+L[2];
+  $('#lvlIc').textContent=L[1];$('#lvlName').textContent=L[2];
+  $('#lvlTxt').textContent=fmt(store.total)+' Punkte gesammelt'+(N?` · noch ${fmt(N[0]-store.total)} bis „${N[2]}“ ${N[1]}`:' · höchste Stufe erreicht! 🎉');
+  $('#lvlBar').style.width=(N?Math.min(100,(store.total-L[0])/(N[0]-L[0])*100):100)+'%';
+}
+
+/* ============================================================
+   Startseite
+   ============================================================ */
+let selCats=new Set(Object.keys(CATS)),selAfb=new Set([1,2,3]),selCount=10;
+function renderHome(){
+  $('#heroArt').innerHTML=FIG.heroArt();
+  $('#cats').innerHTML=Object.entries(CATS).map(([k,c])=>{
+    const ts=TASKS.filter(t=>t.c===k),done=ts.filter(t=>store.best[t.id]===1).length;
+    return `<div class="cat ${selCats.has(k)?'on':''}" style="background:${c.bg}" onclick="toggleCat('${k}')">
+      <span class="chk">✓</span><div class="ic">${c.ic}</div><div class="nm">${c.n}</div>
+      <div class="bar"><i style="width:${done/ts.length*100}%"></i></div>
+      <div class="meta"><span>${done}/${ts.length} gemeistert</span><button class="sp" onclick="event.stopPropagation();openSpick('${k}')">Spickzettel</button></div></div>`;}).join('');
+  const afbInfo=[[1,'AFB I ★','Wissen wiedergeben'],[2,'AFB II ★★','Anwenden & Erklären'],[3,'AFB III ★★★','Beurteilen & Knobeln']];
+  $('#afbs').innerHTML=afbInfo.map(a=>`<button class="tg ${selAfb.has(a[0])?'on':''}" onclick="toggleAfb(${a[0]})"><b>${a[1]}</b><small>${a[2]}</small></button>`).join('');
+  $('#counts').innerHTML=[[5,'Kurz'],[10,'Normal'],[20,'Lang'],[999,'Alle']].map(c=>`<button class="tg ${selCount===c[0]?'on':''}" onclick="selCount=${c[0]};renderHome()"><b>${c[0]===999?'alle':c[0]} Aufgaben</b><small>${c[1]}</small></button>`).join('');
+  const nw=store.wrong.filter(id=>TASKS.some(t=>t.id===id)).length;
+  $('#wrongBtn').textContent=`🔁 Fehler wiederholen (${nw})`;$('#wrongBtn').disabled=!nw;
+  updateHeader();
+}
+function toggleCat(k){selCats.has(k)?selCats.delete(k):selCats.add(k);renderHome();}
+function toggleAfb(a){selAfb.has(a)?selAfb.delete(a):selAfb.add(a);renderHome();}
+function openSpick(k){const c=CATS[k];$('#spBox').innerHTML=`<h2>${c.ic} Spickzettel: ${c.n}</h2>${SPICK[k]}<button class="btn" onclick="closeModal('spModal')">Schließen</button>`;openModal('spModal');}
+function openModal(id){$('#'+id).classList.add('show');}
+function closeModal(id){$('#'+id).classList.remove('show');}
+function show(id){['home','quiz','summary'].forEach(s=>$('#'+s).classList.toggle('hide',s!==id));window.scrollTo({top:0,behavior:'smooth'});}
+function showHome(){renderHome();show('home');}
+function resetAll(){if(confirm('Wirklich alle Punkte und den Fortschritt löschen?')){store={total:0,best:{},wrong:[]};save();renderHome();}}
+
+/* ============================================================
+   Übungsrunde
+   ============================================================ */
+let S=null;
+function startSel(){
+  const pool=TASKS.filter(t=>selCats.has(t.c)&&selAfb.has(t.a));
+  if(!pool.length){$('#homeWarn').textContent='Bitte wähle mindestens ein Thema und einen Anforderungsbereich aus.';return;}
+  $('#homeWarn').textContent='';
+  let list=shuffle(pool).slice(0,selCount);
+  list.sort((x,y)=>x.a-y.a);
+  startSession(list,'Übung');
+}
+function startExam(){
+  let list=[];
+  Object.keys(CATS).forEach(k=>{const ts=shuffle(TASKS.filter(t=>t.c===k));
+    const a1=ts.find(t=>t.a===1),a2=ts.find(t=>t.a===2),a3=ts.find(t=>t.a===3);
+    [a1,a2].forEach(t=>t&&list.push(t)); if(a3&&list.filter(t=>t.a===3).length<2)list.push(a3);});
+  list=list.slice(0,12).sort((x,y)=>x.a-y.a);
+  startSession(list,'Probe-Kursarbeit');
+}
+function startWrong(){const list=shuffle(TASKS.filter(t=>store.wrong.includes(t.id)));if(list.length)startSession(list,'Fehler wiederholen');}
+function startSession(list,name){S={list,i:0,pts:0,max:0,res:[],name};show('quiz');renderTask();}
+
+const TYPENAME={mc:'Auswahl',multi:'Mehrfachauswahl',tf:'Richtig/Falsch',order:'Reihenfolge',match:'Zuordnen',label:'Abbildung beschriften',cat:'Sortieren',cloze:'Lückentext',num:'Rechnen',free:'Freitext',sbform:'Steckbrief schreiben',mark:'Text markieren'};
+let R=null;
+function renderTask(){
+  const t=S.list[S.i],c=CATS[t.c];
+  $('#qProg').style.width=(S.i/S.list.length*100)+'%';$('#qCount').textContent=`${S.i+1} / ${S.list.length}`;$('#qPts').textContent='+'+fmt(S.pts)+' P.';
+  const stars='★'.repeat(t.a)+'☆'.repeat(3-t.a);
+  const box=$('#taskBox');
+  box.innerHTML=`<div class="task" style="border-top-color:${c.bg}">
+    <div class="chips"><span class="chip" style="background:${c.bg}">${c.ic} ${c.n}</span><span class="chip">AFB ${['I','II','III'][t.a-1]} ${stars}</span><span class="chip">${TYPENAME[t.type]}</span><span class="chip">🏅 ${fmt(t.p)} ${t.p===1?'Punkt':'Punkte'}</span></div>
+    <p class="q">${t.q}</p>
+    ${t.fig?`<div class="figbox">${FIG[t.fig]()}</div>`:''}
+    ${t.info?`<div class="info">${t.info}</div>`:''}
+    <div id="body"></div>
+    <div class="actions"><button class="btn" id="chkBtn">Prüfen</button><span class="warn" id="warn"></span></div>
+    <div class="fb" id="fb"></div></div>`;
+  R=RENDER[t.type](t,$('#body'));
+  $('#chkBtn').onclick=()=>{
+    const r=R.check(ratio=>finish(t,ratio));
+    if(r===false){$('#warn').textContent='Bitte beantworte die Aufgabe zuerst vollständig.';return;}
+    $('#warn').textContent='';$('#chkBtn').classList.add('hide');
+  };
+}
+function finish(t,ratio){
+  ratio=Math.max(0,Math.min(1,ratio));
+  const got=Math.round(ratio*t.p*2)/2;
+  S.pts+=got;S.max+=t.p;S.res.push({t,got});
+  store.total+=got;store.best[t.id]=Math.max(store.best[t.id]||0,ratio>=.999?1:ratio);
+  if(ratio<.999){if(!store.wrong.includes(t.id))store.wrong.push(t.id);}else store.wrong=store.wrong.filter(x=>x!==t.id);
+  save();updateHeader();$('#qPts').textContent='+'+fmt(S.pts)+' P.';
+  const cls=ratio>=.999?'ok':ratio>=.5?'part':'bad';
+  const head=ratio>=.999?['🎉','Super, alles richtig!']:ratio>=.5?['👍','Schon gut, aber noch nicht perfekt.']:['💡','Schau dir die Lösung genau an.'];
+  const fb=$('#fb');fb.className='fb show '+cls;
+  fb.innerHTML=`<h3>${head[0]} ${head[1]} <span style="float:right">+${fmt(got)} / ${fmt(t.p)} P.</span></h3>${t.e?`<div class="ex">${t.e}</div>`:''}
+   <div class="actions"><button class="btn" id="nextBtn">${S.i<S.list.length-1?'Weiter →':'Zur Auswertung 🏁'}</button></div>`;
+  $('#nextBtn').onclick=()=>{S.i++;S.i<S.list.length?(renderTask(),window.scrollTo({top:0,behavior:'smooth'})):showSummary();};
+  if(ratio>=.999)confetti();
+  fb.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function showSummary(){
+  if(!S)return showHome();
+  const pct=S.max?Math.round(S.pts/S.max*100):0;
+  const msg=pct>=90?'Hervorragend! Du bist bestens vorbereitet. 🏆':pct>=70?'Gut gemacht! Wiederhole noch die Fehler. 💪':pct>=50?'Ordentlich! Schau dir die Spickzettel noch einmal an. 📚':'Dranbleiben! Lies die Spickzettel und probiere es noch einmal. 🌱';
+  $('#summary').innerHTML=`<div class="card" style="text-align:center;margin-top:26px">
+    <div class="fred" style="color:var(--muted)">${S.name} beendet</div>
+    <div class="big">${fmt(S.pts)} <span style="font-size:26px;color:var(--muted)">/ ${fmt(S.max)} Punkten</span></div>
+    <div class="lvl-bar" style="max-width:420px;margin:14px auto"><i style="width:${pct}%"></i></div>
+    <p class="fred" style="font-size:20px;margin:8px 0">${pct} % · ${msg}</p></div>
+    <div class="card"><h2 style="margin-top:0">Deine Aufgaben</h2><ul class="sum-list">${S.res.map(r=>{const q=r.got/r.t.p;const col=q>=.999?'var(--ok)':q>=.5?'var(--part)':'var(--bad)';
+      return `<li><span class="s" style="background:${col}">${q>=.999?'✓':q>=.5?'~':'✗'}</span><span style="flex:1">${CATS[r.t.c].ic} ${r.t.q.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,90)}…</span><b>${fmt(r.got)}/${fmt(r.t.p)}</b></li>`;}).join('')||'<li>Keine Aufgabe bearbeitet.</li>'}</ul></div>
+    <div class="go-row"><button class="btn mint" onclick="showHome()">🏠 Zur Startseite</button>${store.wrong.length?'<button class="btn peach" onclick="startWrong()">🔁 Fehler wiederholen</button>':''}</div>`;
+  show('summary');S=null;
+}
+function confetti(){const em=['⭐','🦠','🎉','✨','🧫'];for(let i=0;i<16;i++){const s=document.createElement('span');s.className='confetti';s.textContent=em[i%em.length];
+  s.style.left=(window.innerWidth/2)+'px';s.style.top=(window.innerHeight*0.6)+'px';s.style.setProperty('--dx',(Math.random()*600-300)+'px');s.style.setProperty('--dy',(-Math.random()*400-100)+'px');
+  document.body.appendChild(s);setTimeout(()=>s.remove(),1400);}}
+
+/* ============================================================
+   Renderer je Aufgabentyp
+   check(done) → false, wenn unvollständig; sonst wird done(anteil) aufgerufen
+   ============================================================ */
+const RENDER={
+mc(t,el){return RENDER.multi(t,el,true);},
+multi(t,el,single){
+  const opts=shuffle(t.o.map(s=>({t:s.replace(/^\+/,''),c:s.startsWith('+')})));
+  el.innerHTML=(single?'':'<p style="margin:0 0 6px;font-size:14px;color:var(--muted)">Mehrere Antworten können richtig sein. Falsch angekreuzte Antworten geben Abzug.</p>')+
+    opts.map((o,k)=>`<label class="opt"><input type="${single?'radio':'checkbox'}" name="mc" value="${k}"><span>${o.t}</span></label>`).join('');
+  return{check(done){
+    const ins=[...el.querySelectorAll('input')];if(!ins.some(i=>i.checked))return false;
+    let r;if(single){r=opts[ins.findIndex(i=>i.checked)].c?1:0;}
+    else{const n=opts.filter(o=>o.c).length;let g=0,b=0;ins.forEach((i,k)=>{if(i.checked)opts[k].c?g++:b++;});r=Math.max(0,(g-b)/n);}
+    ins.forEach((i,k)=>{i.disabled=true;const l=i.parentElement;if(opts[k].c)l.classList.add('ok');else if(i.checked)l.classList.add('bad');});
+    done(r);}};
+},
+tf(t,el){
+  const st=shuffle(t.s);const ans=new Array(st.length).fill(null);
+  el.innerHTML=st.map((s,k)=>`<div class="row" id="tf${k}"><span class="txt">${s[0]}</span><span class="seg"><button data-k="${k}" data-v="1">richtig</button><button data-k="${k}" data-v="0">falsch</button></span></div>`).join('');
+  el.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;ans[k]=b.dataset.v==='1';b.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));});
+  return{check(done){
+    if(ans.includes(null))return false;let ok=0;
+    st.forEach((s,k)=>{const row=$('#tf'+k),good=ans[k]===s[1];if(good)ok++;row.classList.add(good?'ok':'bad');row.querySelectorAll('button').forEach(b=>b.disabled=true);
+      if(!good||s[2])row.insertAdjacentHTML('beforeend',`<div class="why">${good?'✓':'✗ Richtig wäre: <b>'+(s[1]?'richtig':'falsch')+'</b>.'} ${s[2]}</div>`);});
+    done(ok/st.length);}};
+},
+order(t,el){
+  const n=t.items.length;let cur=shuffle([...Array(n).keys()]);
+  while(cur.every((v,i)=>v===i))cur=shuffle(cur);
+  let locked=false;
+  const draw=()=>{el.innerHTML='<ul class="ord">'+cur.map((v,i)=>`<li id="o${i}"><span class="n">${i+1}</span><span class="t">${t.items[v]}</span>${locked?'':`<span class="mv"><button data-i="${i}" data-d="-1" ${i===0?'disabled':''}>▲</button><button data-i="${i}" data-d="1" ${i===n-1?'disabled':''}>▼</button></span>`}</li>`).join('')+'</ul>';
+    el.querySelectorAll('.mv button').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,j=i+ +b.dataset.d;[cur[i],cur[j]]=[cur[j],cur[i]];draw();});};
+  draw();
+  return{check(done){locked=true;draw();let ok=0;cur.forEach((v,i)=>{const li=$('#o'+i);if(v===i){ok++;li.classList.add('ok');}else{li.classList.add('bad');li.insertAdjacentHTML('beforeend',`<span class="sol">→ gehört an Platz ${v+1}</span>`);}});done(ok/n);}};
+},
+match(t,el){
+  const rights=shuffle(t.pairs.map(p=>p[1]).concat(t.x||[]));const lefts=shuffle(t.pairs);
+  el.innerHTML=lefts.map((p,k)=>`<div class="row"><span class="txt"><b>${p[0]}</b></span><select id="m${k}" style="flex:1.4;min-width:220px"><option value="">– bitte wählen –</option>${rights.map(r=>`<option>${esc(r)}</option>`).join('')}</select></div>`).join('');
+  return{check(done){
+    const sels=lefts.map((p,k)=>$('#m'+k));if(sels.some(s=>!s.value))return false;let ok=0;
+    sels.forEach((s,k)=>{s.disabled=true;if(s.value===lefts[k][1]){ok++;s.classList.add('ok');}else{s.classList.add('bad');s.insertAdjacentHTML('afterend',`<div class="why">✓ Richtig: <b>${lefts[k][1]}</b></div>`);}});
+    done(ok/lefts.length);}};
+},
+label(t,el){
+  const opts=shuffle(t.l.concat(t.x||[]));const marks=t.mk||t.l.map((_,i)=>i+1);
+  el.innerHTML='<div class="lblgrid">'+t.l.map((_,k)=>`<div class="lbl"><span class="n">${marks[k]}</span><select id="l${k}"><option value="">– Begriff wählen –</option>${opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select></div>`).join('')+'</div>';
+  return{check(done){
+    const sels=t.l.map((_,k)=>$('#l'+k));if(sels.some(s=>!s.value))return false;let ok=0;
+    sels.forEach((s,k)=>{s.disabled=true;if(s.value===t.l[k]){ok++;s.classList.add('ok');}else{s.classList.add('bad');s.parentElement.insertAdjacentHTML('afterend',`<div class="why" style="margin:-4px 0 4px 38px">✓ ${marks[k]}: <b>${t.l[k]}</b></div>`);}});
+    done(ok/t.l.length);}};
+},
+cat(t,el){
+  const items=shuffle(t.items);const ans=new Array(items.length).fill(null);
+  el.innerHTML=items.map((it,k)=>`<div class="row" id="c${k}"><span class="txt">${it[0]}</span><span class="seg">${t.b.map((b,j)=>`<button data-k="${k}" data-j="${j}">${b}</button>`).join('')}</span></div>`).join('');
+  el.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{ans[+b.dataset.k]=+b.dataset.j;b.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));});
+  return{check(done){
+    if(ans.includes(null))return false;let ok=0;
+    items.forEach((it,k)=>{const row=$('#c'+k),good=ans[k]===it[1];if(good)ok++;row.classList.add(good?'ok':'bad');row.querySelectorAll('button').forEach(b=>b.disabled=true);
+      if(!good)row.insertAdjacentHTML('beforeend',`<div class="why">✓ Richtig: <b>${t.b[it[1]]}</b></div>`);});
+    done(ok/items.length);}};
+},
+cloze(t,el){
+  const gaps=[];let k=0;
+  const html=t.t.replace(/\[([^\]]+)\]|\{([^}]+)\}/g,(m,sel,typ)=>{
+    if(sel){const parts=sel.split('|');gaps.push({kind:'s',ans:parts[0]});return `<select id="g${k++}"><option value="">…</option>${shuffle(parts).map(p=>`<option>${esc(p)}</option>`).join('')}</select>`;}
+    const parts=typ.split('|');gaps.push({kind:'t',ans:parts[0],alt:parts.map(norm)});return `<input type="text" id="g${k++}" autocomplete="off" spellcheck="false">`;});
+  el.innerHTML=`<div class="cloze">${html}</div>`;
+  return{check(done){
+    const ins=gaps.map((_,i)=>$('#g'+i));if(ins.some(x=>!x.value.trim()))return false;let ok=0;
+    gaps.forEach((g,i)=>{const x=ins[i];x.disabled=true;const good=g.kind==='s'?x.value===g.ans:g.alt.includes(norm(x.value));
+      if(good){ok++;x.classList.add('ok');}else{x.classList.add('bad');x.insertAdjacentHTML('afterend',`<span class="sol">✓ ${g.ans}</span>`);}});
+    done(ok/gaps.length);}};
+},
+num(t,el){
+  el.innerHTML=`<div class="row" style="justify-content:flex-start"><input type="number" id="numIn" inputmode="numeric" style="width:180px"> <span>${t.unit||''}</span></div><p style="font-size:14px;color:var(--muted);margin:4px 0 0">Tipp: Rechne zuerst aus, wie viele Teilungen in der Zeit stattfinden.</p>`;
+  return{check(done){const x=$('#numIn');const v=parseFloat(String(x.value).replace(',','.'));if(isNaN(v))return false;x.disabled=true;const good=Math.abs(v-t.ans)<=(t.tol||0);
+    x.classList.add(good?'ok':'bad');if(!good)x.insertAdjacentHTML('afterend',`<span class="sol">✓ ${t.ans.toLocaleString('de-DE')}</span>`);done(good?1:0);}};
+},
+free(t,el){
+  el.innerHTML=`<textarea id="freeIn" placeholder="Schreibe deine Antwort in ganzen Sätzen. Verwende Fachbegriffe!"></textarea><div id="hz"></div>`;
+  return{check(done){
+    const ta=$('#freeIn'),txt=ta.value.trim();if(txt.length<25)return false;ta.disabled=true;const low=txt.toLowerCase();
+    const hits=t.pts.map(p=>p.kw.some(w=>low.includes(w.toLowerCase())));
+    $('#hz').innerHTML=`<div class="horizon"><b class="fred" style="font-size:18px">Erwartungshorizont</b><p style="margin:4px 0 6px;font-size:14.5px">Vergleiche ehrlich: Hake nur ab, was <b>wirklich</b> in deiner Antwort steht. Die grünen Hinweise zeigen, wo passende Stichwörter gefunden wurden. Das ist nur eine Hilfe, entscheiden musst du selbst!</p>
+      ${t.pts.map((p,i)=>`<label><input type="checkbox" id="hp${i}" ${hits[i]?'checked':''}><span>${p.t}${hits[i]?'<span class="found">Stichwort gefunden</span>':''}</span></label>`).join('')}
+      <div class="model"><b>Musterlösung:</b><br>${t.m}</div>
+      <div class="actions"><button class="btn mint" id="takeBtn">Punkte übernehmen</button></div></div>`;
+    $('#takeBtn').onclick=()=>{const n=t.pts.filter((_,i)=>$('#hp'+i).checked).length;t.pts.forEach((_,i)=>$('#hp'+i).disabled=true);$('#takeBtn').remove();done(n/t.pts.length);};
+  }};
+},
+sbform(t,el){
+  el.innerHTML=`<div class="fred" style="font-size:20px;margin:6px 0">Steckbrief: Salmonellose</div><div class="sbf">${t.f.map((f,i)=>`<div class="k" style="background:${f.c}">${f.l}</div><div class="v"><textarea id="sf${i}" placeholder="Stichpunkte …"></textarea></div>`).join('')}</div><div id="hz"></div>`;
+  return{check(done){
+    const vals=t.f.map((_,i)=>$('#sf'+i).value.trim());if(vals.filter(v=>v.length>2).length<5)return false;
+    t.f.forEach((_,i)=>$('#sf'+i).disabled=true);
+    const hits=t.f.map((f,i)=>f.kw.some(w=>vals[i].toLowerCase().includes(w)));
+    $('#hz').innerHTML=`<div class="horizon"><b class="fred" style="font-size:18px">Vergleich mit der Musterlösung</b><p style="margin:4px 0 6px;font-size:14.5px">Hake jedes Feld ab, das inhaltlich stimmt.</p>
+      ${t.f.map((f,i)=>`<label><input type="checkbox" id="hp${i}" ${hits[i]?'checked':''}><span><b style="background:${f.c};padding:0 6px;border-radius:6px">${f.l}</b> ${f.m}${hits[i]?'<span class="found">Stichwort gefunden</span>':''}</span></label>`).join('')}
+      <label><input type="checkbox" id="hpx"><span>${t.extra.t}</span></label>
+      <div class="actions"><button class="btn mint" id="takeBtn">Punkte übernehmen</button></div></div>`;
+    $('#takeBtn').onclick=()=>{const n=t.f.filter((_,i)=>$('#hp'+i).checked).length+($('#hpx').checked?1:0);$('#takeBtn').remove();el.querySelectorAll('.horizon input').forEach(x=>x.disabled=true);done(n/(t.f.length+1));};
+  }};
+},
+mark(t,el){
+  const spans=[];let k=0;
+  const html=t.t.replace(/\[\[(.+?)\|(\w+)\]\]/g,(m,txt,c)=>{spans.push({c:c==='x'?-1:+c,u:null});return `<span class="mk" data-i="${k++}">${txt}</span>`;});
+  let act=0;
+  el.innerHTML=`<div class="legend">${LEG.map((l,i)=>`<button data-c="${i}" style="background:${l[1]}" class="${i===0?'on':''}">${l[0]}</button>`).join('')}<button data-c="-9" class="rub">🧽 Radierer</button></div><div class="marktext">${html}</div>`;
+  el.querySelectorAll('.legend button').forEach(b=>b.onclick=()=>{act=+b.dataset.c;el.querySelectorAll('.legend button').forEach(x=>x.classList.toggle('on',x===b));});
+  const paint=()=>el.querySelectorAll('.mk').forEach(s=>{const u=spans[+s.dataset.i].u;s.style.background=u===null?'':LEG[u][1];});
+  let locked=false;
+  el.querySelectorAll('.mk').forEach(s=>s.onclick=()=>{if(locked)return;const sp=spans[+s.dataset.i];sp.u=(act===-9||sp.u===act)?null:act;paint();});
+  return{check(done){
+    if(!spans.some(s=>s.u!==null))return false;locked=true;
+    const targets=spans.filter(s=>s.c>=0);let ok=0,bad=0;
+    el.querySelectorAll('.mk').forEach(s=>{const sp=spans[+s.dataset.i];
+      if(sp.c>=0){s.style.background=LEG[sp.c][1];if(sp.u===sp.c){ok++;s.classList.add('ok');}else{s.classList.add('miss');}}
+      else{if(sp.u!==null){bad++;s.classList.add('badx');}else s.style.background='';}});
+    el.insertAdjacentHTML('beforeend',`<p style="font-size:14px;margin:8px 0 0">So sieht die Lösung aus: <span style="outline:2px solid var(--ok);padding:0 4px;border-radius:4px">grün umrandet</span> = von dir richtig markiert · <span style="outline:2px dashed var(--bad);padding:0 4px;border-radius:4px">rot gestrichelt</span> = fehlte oder falsche Farbe · <span style="text-decoration:line-through;background:var(--bad-bg);padding:0 4px">durchgestrichen</span> = gehört nicht in den Steckbrief.<br>Richtig: <b>${ok}/${targets.length}</b> · unnötig markiert: <b>${bad}</b></p>`);
+    done(Math.max(0,(ok-bad)/targets.length));}};
+}
+};
+
+renderHome();
+</script>
+</body>
+</html>
